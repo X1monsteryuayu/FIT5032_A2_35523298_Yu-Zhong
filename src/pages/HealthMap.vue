@@ -3,137 +3,207 @@
     <!-- Header Section -->
     <div class="map-header">
       <div class="container-fluid">
-        <div class="row align-items-center py-3">
+        <div class="row align-items-center py-4">
           <div class="col">
-            <h2 class="mb-0">
-              <i class="fas fa-map-marked-alt me-2 text-primary"></i>
+            <h2 class="mb-1">
+              <i class="fas fa-map-marked-alt me-3 text-primary"></i>
               Health Facilities Locator
             </h2>
-            <p class="text-muted mb-0">Find nearby medical facilities and get directions</p>
+            <p class="text-muted mb-0 fs-6">Find nearby medical facilities and get directions</p>
           </div>
           <div class="col-auto">
-            <button @click="getCurrentLocation" class="btn btn-primary">
-              <i class="fas fa-location-arrow me-2"></i>Use My Location
-            </button>
+            <div class="btn-group">
+              <button @click="getCurrentLocation" class="btn btn-primary btn-lg shadow-sm" title="获取当前位置">
+                <i class="fas fa-location-arrow me-2"></i>Use My Location
+              </button>
+              <button @click="searchNearbyFacilities" class="btn btn-success btn-lg shadow-sm" title="搜索附近设施" :disabled="loading">
+                <i class="fas fa-search me-2" v-if="!loading"></i>
+                <span class="spinner-border spinner-border-sm me-2" v-else role="status"></span>
+                Quick Search
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="container-fluid h-100">
-      <div class="row h-100">
+      <div class="row h-100 g-4">
+        <!-- Mobile Toggle Button -->
+        <button 
+          v-if="isMobile" 
+          @click="toggleSidebar" 
+          class="mobile-sidebar-toggle btn btn-primary position-fixed"
+          :class="{ 'active': sidebarOpen }"
+          aria-label="切换侧边栏菜单"
+          :aria-expanded="sidebarOpen"
+          aria-controls="sidebar-content"
+        >
+          <i class="fas fa-bars" v-if="!sidebarOpen" aria-hidden="true"></i>
+          <i class="fas fa-times" v-if="sidebarOpen" aria-hidden="true"></i>
+        </button>
+        
         <!-- Enhanced Sidebar -->
-        <div class="col-lg-4 col-md-5 sidebar">
-          <div class="sidebar-content">
+        <div class="col-lg-4 col-md-5 sidebar" :class="{ 'open': sidebarOpen }" role="complementary" aria-label="搜索和结果面板" id="sidebar-content">
+          <!-- 移动端遮罩层 -->
+          <div v-if="isMobile && sidebarOpen" class="sidebar-overlay" @click="toggleSidebar" aria-hidden="true"></div>
+          
+          <div class="sidebar-content p-4">
             
             <!-- Search Section -->
-            <div class="search-card">
+            <div class="search-card mb-4" role="search" aria-labelledby="search-heading">
               <div class="card-header">
-                <h5 class="mb-0">
-                  <i class="fas fa-search me-2"></i>Search Medical Facilities
-                </h5>
+                <h2 id="search-heading" class="mb-0 fw-bold">
+                  <i class="fas fa-search me-2" aria-hidden="true"></i>搜索医疗设施
+                </h2>
               </div>
-              <div class="card-body">
-                <div class="mb-3">
-                  <label class="form-label">Location</label>
-                  <div class="input-group">
-                    <span class="input-group-text">
-                      <i class="fas fa-map-marker-alt"></i>
+              <div class="card-body p-4">
+                <div class="mb-4">
+                  <label for="location-input" class="form-label fw-semibold mb-2">位置</label>
+                  <div class="input-group input-group-lg">
+                    <span class="input-group-text bg-light border-end-0" aria-hidden="true">
+                      <i class="fas fa-map-marker-alt text-primary"></i>
                     </span>
                     <input 
+                      id="location-input"
                       v-model="searchQuery" 
                       type="text" 
-                      class="form-control" 
-                      placeholder="Enter address or landmark"
+                      class="form-control border-start-0 ps-2" 
+                      placeholder="输入地址或地标"
                       @keyup.enter="searchLocation"
+                      aria-describedby="location-help"
                     >
                   </div>
+                  <small id="location-help" class="form-text text-muted">
+                    输入您要搜索的地址、城市或地标名称
+                  </small>
                 </div>
                 
-                <div class="mb-3">
-                  <label class="form-label">Facility Type</label>
-                  <select v-model="facilityType" class="form-select">
-                    <option value="">All Facilities</option>
-                    <option value="hospital">🏥 Hospitals</option>
-                    <option value="clinic">🩺 Clinics</option>
-                    <option value="pharmacy">💊 Pharmacies</option>
-                    <option value="emergency">🚑 Emergency Services</option>
+                <div class="mb-4">
+                  <label for="facility-type" class="form-label fw-semibold mb-2">设施类型</label>
+                  <select id="facility-type" v-model="facilityType" class="form-select form-select-lg" aria-describedby="facility-help">
+                    <option value="">所有设施</option>
+                    <option value="hospital">🏥 医院</option>
+                    <option value="clinic">🩺 诊所</option>
+                    <option value="pharmacy">💊 药店</option>
+                    <option value="emergency">🚑 急救服务</option>
                   </select>
+                  <small id="facility-help" class="form-text text-muted">
+                    选择您要查找的医疗设施类型
+                  </small>
                 </div>
                 
-                <div class="mb-3">
-                  <label class="form-label">
-                    Search Radius: <span class="text-primary fw-bold">{{ searchRadius }}km</span>
+                <div class="mb-4">
+                  <label for="search-radius" class="form-label fw-semibold mb-3">
+                    搜索半径: <span class="text-primary fw-bold fs-5">{{ searchRadius }}公里</span>
                   </label>
                   <input 
+                    id="search-radius"
                     v-model="searchRadius" 
                     type="range" 
                     class="form-range" 
                     min="1" 
                     max="50" 
                     step="1"
+                    aria-describedby="radius-help"
                   >
-                  <div class="d-flex justify-content-between small text-muted">
-                    <span>1km</span>
-                    <span>50km</span>
+                  <div class="d-flex justify-content-between small text-muted mt-2">
+                    <span>1公里</span>
+                    <span>50公里</span>
                   </div>
+                  <small id="radius-help" class="form-text text-muted">
+                    调整搜索范围，数值越大搜索范围越广
+                  </small>
                 </div>
                 
-                <button @click="searchLocation" class="btn btn-primary w-100">
-                  <i class="fas fa-search me-2"></i>Search Facilities
+                <button 
+                  @click="searchLocation" 
+                  class="btn btn-primary btn-lg w-100 shadow-sm mb-3"
+                  :disabled="loading"
+                  :aria-busy="loading"
+                  aria-describedby="search-status"
+                >
+                  <i class="fas fa-search me-2" aria-hidden="true"></i>搜索真实设施
                 </button>
+                
+                <button 
+                  @click="searchNearbyFacilities" 
+                  class="btn btn-outline-success btn-lg w-100 shadow-sm" 
+                  :disabled="loading"
+                  :aria-busy="loading"
+                >
+                  <i class="fas fa-map-marked-alt me-2" aria-hidden="true"></i>
+                  <span v-if="!loading">查找附近设施</span>
+                  <span v-else>
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    搜索中...
+                  </span>
+                </button>
+                <div id="search-status" class="visually-hidden" aria-live="polite">
+                  {{ loading ? '正在搜索医疗设施，请稍候' : '' }}
+                </div>
+                
+                <div class="mt-3 p-3 bg-info bg-opacity-10 rounded">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-info-circle text-info me-2"></i>
+                    <small class="text-muted">
+                      <strong>Real functionality:</strong> Uses live data from OpenStreetMap and real routing services
+                    </small>
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- Results Section -->
-            <div class="results-card mt-4" v-if="searchResults.length > 0">
+            <div class="results-card mb-4" v-if="searchResults.length > 0">
               <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
+                <h5 class="mb-0 fw-bold">
                   <i class="fas fa-list me-2"></i>Found {{ searchResults.length }} facilities
                 </h5>
-                <span class="badge bg-success">{{ searchResults.length }}</span>
+                <span class="badge bg-success fs-6 px-3 py-2">{{ searchResults.length }}</span>
               </div>
               <div class="card-body p-0">
                 <div class="results-list">
                   <div 
                     v-for="facility in searchResults" 
                     :key="facility.id"
-                    class="facility-item"
+                    class="facility-item p-4"
                     :class="{ 'selected': selectedFacility?.id === facility.id }"
+                    :data-real="facility.isReal"
                     @click="selectFacility(facility)"
                   >
-                    <div class="facility-icon">
+                    <div class="facility-icon me-3">
                       <i :class="getFacilityIcon(facility.type)" 
-                         :style="{ color: getFacilityColor(facility.type) }"></i>
+                         :style="{ color: getFacilityColor(facility.type), fontSize: '1.5rem' }"></i>
                     </div>
                     
-                    <div class="facility-info">
-                      <h6 class="facility-name">{{ facility.name }}</h6>
-                      <p class="facility-address">{{ facility.address }}</p>
+                    <div class="facility-info flex-grow-1">
+                      <h6 class="facility-name mb-2 fw-bold">{{ facility.name }}</h6>
+                      <p class="facility-address mb-3 text-muted">{{ facility.address }}</p>
                       
-                      <div class="facility-meta">
-                        <span class="badge me-2" :style="{ backgroundColor: getFacilityColor(facility.type) }">
+                      <div class="facility-meta mb-3">
+                        <span class="badge me-3 px-3 py-2" :style="{ backgroundColor: getFacilityColor(facility.type) }">
                           {{ facility.type }}
                         </span>
-                        <span class="text-muted small">
-                          <i class="fas fa-route me-1"></i>{{ facility.distance }}km
+                        <span class="text-muted">
+                          <i class="fas fa-route me-1"></i>{{ facility.distance }}km away
                         </span>
                       </div>
                       
-                      <div class="facility-details mt-2">
-                        <div class="d-flex justify-content-between">
-                          <span class="text-success small">
-                            <i class="fas fa-star"></i> {{ facility.rating }}/5
+                      <div class="facility-details">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span class="text-success">
+                            <i class="fas fa-star me-1"></i> {{ facility.rating }}/5
                           </span>
                           <span class="text-muted small">
-                            <i class="fas fa-clock"></i> {{ facility.hours }}
+                            <i class="fas fa-clock me-1"></i> {{ facility.hours }}
                           </span>
                         </div>
                       </div>
                     </div>
                     
-                    <div class="facility-action">
-                      <i class="fas fa-chevron-right"></i>
+                    <div class="facility-action ms-3">
+                      <i class="fas fa-chevron-right text-muted"></i>
                     </div>
                   </div>
                 </div>
@@ -141,72 +211,100 @@
             </div>
 
             <!-- Navigation Section -->
-            <div class="navigation-card mt-4" v-if="selectedFacility">
+            <div class="navigation-card mb-4" v-if="selectedFacility">
               <div class="card-header">
-                <h5 class="mb-0">
+                <h5 class="mb-0 fw-bold">
                   <i class="fas fa-navigation me-2"></i>Navigation
                 </h5>
               </div>
-              <div class="card-body">
-                <div class="selected-facility mb-3">
+              <div class="card-body p-4">
+                <div class="selected-facility mb-4 p-3 bg-light rounded">
                   <div class="d-flex align-items-center">
-                    <div class="facility-icon-small me-3">
+                    <div class="facility-icon-small me-3 p-2 rounded-circle bg-white">
                       <i :class="getFacilityIcon(selectedFacility.type)" 
-                         :style="{ color: getFacilityColor(selectedFacility.type) }"></i>
+                         :style="{ color: getFacilityColor(selectedFacility.type), fontSize: '1.2rem' }"></i>
                     </div>
                     <div>
-                      <h6 class="mb-1">{{ selectedFacility.name }}</h6>
+                      <h6 class="mb-1 fw-bold">{{ selectedFacility.name }}</h6>
                       <p class="text-muted small mb-0">{{ selectedFacility.address }}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div class="mb-3">
-                  <label class="form-label">Transportation Mode</label>
-                  <div class="travel-modes">
+                <div class="mb-4">
+                  <label class="form-label fw-semibold mb-3">Transportation Mode</label>
+                  <div class="travel-modes d-flex gap-2">
                     <label v-for="mode in travelModes" :key="mode.value" 
-                           class="travel-mode-option"
+                           class="travel-mode-option flex-fill text-center p-3 rounded"
                            :class="{ active: travelMode === mode.value }">
                       <input type="radio" v-model="travelMode" :value="mode.value" class="d-none">
-                      <span class="mode-icon">{{ mode.icon }}</span>
-                      <span class="mode-label">{{ mode.label }}</span>
+                      <div class="mode-icon fs-4 mb-2">{{ mode.icon }}</div>
+                      <div class="mode-label small fw-semibold">{{ mode.label }}</div>
                     </label>
                   </div>
                 </div>
                 
-                <div class="d-grid gap-2">
-                  <button @click="getDirections" class="btn btn-success">
-                    <i class="fas fa-route me-2"></i>Get Directions
+                <div class="d-grid gap-3">
+                  <button @click="getDirections" class="btn btn-success btn-lg shadow-sm">
+                    <i class="fas fa-route me-2"></i>Get Real Directions
                   </button>
-                  <button @click="startNavigation" class="btn btn-info">
-                    <i class="fas fa-external-link-alt me-2"></i>Open in Maps
+                  <button @click="startNavigation" class="btn btn-info btn-lg shadow-sm">
+                    <i class="fas fa-external-link-alt me-2"></i>Open in Navigation App
+                  </button>
+                  <button @click="shareFacilityLocation" class="btn btn-secondary btn-lg shadow-sm">
+                    <i class="fas fa-share-alt me-2"></i>Share Location
                   </button>
                 </div>
-                
                 <!-- Route Information -->
-                <div v-if="routeInfo" class="route-info mt-3">
+                <div v-if="routeInfo" class="route-info mt-4 p-3 rounded"
+                     :class="routeInfo.isEstimated ? 'bg-warning bg-opacity-10' : 'bg-primary bg-opacity-10'">
+                  <div class="route-header mb-3 text-center">
+                    <div v-if="routeInfo.isEstimated" class="text-warning">
+                      <i class="fas fa-exclamation-triangle me-2"></i>
+                      <strong>Estimated Route</strong>
+                    </div>
+                    <div v-else class="text-success">
+                      <i class="fas fa-check-circle me-2"></i>
+                      <strong>Real-time Route</strong>
+                    </div>
+                  </div>
+                  
                   <div class="route-summary">
-                    <div class="row text-center">
+                    <div class="row text-center g-3">
                       <div class="col-4">
                         <div class="route-stat">
-                          <i class="fas fa-route text-primary"></i>
-                          <div class="stat-value">{{ routeInfo.distance }}</div>
-                          <div class="stat-label">Distance</div>
+                          <i class="fas fa-route text-primary fs-4 mb-2"></i>
+                          <div class="stat-value fw-bold">{{ routeInfo.distance }}</div>
+                          <div class="stat-label small text-muted">Distance</div>
                         </div>
                       </div>
                       <div class="col-4">
                         <div class="route-stat">
-                          <i class="fas fa-clock text-success"></i>
-                          <div class="stat-value">{{ routeInfo.duration }}</div>
-                          <div class="stat-label">Duration</div>
+                          <i class="fas fa-clock text-success fs-4 mb-2"></i>
+                          <div class="stat-value fw-bold">{{ routeInfo.duration }}</div>
+                          <div class="stat-label small text-muted">Duration</div>
                         </div>
                       </div>
                       <div class="col-4">
                         <div class="route-stat">
-                          <i class="fas fa-map text-info"></i>
-                          <div class="stat-value">{{ travelMode }}</div>
-                          <div class="stat-label">Mode</div>
+                          <i class="fas fa-map text-info fs-4 mb-2"></i>
+                          <div class="stat-value fw-bold">{{ routeInfo.mode }}</div>
+                          <div class="stat-label small text-muted">Mode</div>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- 转向指示 -->
+                  <div v-if="routeInfo.steps && routeInfo.steps.length > 0" class="route-steps mt-3">
+                    <h6 class="fw-bold mb-2">
+                      <i class="fas fa-list-ol me-2"></i>Turn-by-turn Directions
+                    </h6>
+                    <div class="steps-container" style="max-height: 200px; overflow-y: auto;">
+                      <div v-for="(step, index) in routeInfo.steps" :key="index" 
+                           class="step-item p-2 mb-2 bg-white bg-opacity-50 rounded">
+                        <span class="step-number badge bg-primary me-2">{{ index + 1 }}</span>
+                        <span class="step-text">{{ step }}</span>
                       </div>
                     </div>
                   </div>
@@ -215,25 +313,27 @@
             </div>
             
             <!-- Quick Stats -->
-            <div class="stats-card mt-4" v-if="searchResults.length > 0">
-              <div class="card-body">
-                <h6 class="card-title">Quick Stats</h6>
+            <div class="stats-card" v-if="searchResults.length > 0">
+              <div class="card-body p-4">
+                <h6 class="card-title fw-bold mb-3">
+                  <i class="fas fa-chart-bar me-2 text-primary"></i>Quick Stats
+                </h6>
                 <div class="stats-grid">
-                  <div class="stat-item">
-                    <span class="stat-number">{{ hospitalCount }}</span>
-                    <span class="stat-label">Hospitals</span>
+                  <div class="stat-item text-center p-3 bg-light rounded">
+                    <span class="stat-number text-danger fw-bold fs-4 d-block">{{ hospitalCount }}</span>
+                    <span class="stat-label small text-muted">Hospitals</span>
                   </div>
-                  <div class="stat-item">
-                    <span class="stat-number">{{ clinicCount }}</span>
-                    <span class="stat-label">Clinics</span>
+                  <div class="stat-item text-center p-3 bg-light rounded">
+                    <span class="stat-number text-success fw-bold fs-4 d-block">{{ clinicCount }}</span>
+                    <span class="stat-label small text-muted">Clinics</span>
                   </div>
-                  <div class="stat-item">
-                    <span class="stat-number">{{ pharmacyCount }}</span>
-                    <span class="stat-label">Pharmacies</span>
+                  <div class="stat-item text-center p-3 bg-light rounded">
+                    <span class="stat-number text-primary fw-bold fs-4 d-block">{{ pharmacyCount }}</span>
+                    <span class="stat-label small text-muted">Pharmacies</span>
                   </div>
-                  <div class="stat-item">
-                    <span class="stat-number">{{ emergencyCount }}</span>
-                    <span class="stat-label">Emergency</span>
+                  <div class="stat-item text-center p-3 bg-light rounded">
+                    <span class="stat-number text-warning fw-bold fs-4 d-block">{{ emergencyCount }}</span>
+                    <span class="stat-label small text-muted">Emergency</span>
                   </div>
                 </div>
               </div>
@@ -243,19 +343,19 @@
 
         <!-- Enhanced Map Container -->
         <div class="col-lg-8 col-md-7 map-container">
-          <div class="map-wrapper">
-            <div id="map" class="enhanced-map"></div>
+          <div class="map-wrapper p-4">
+            <div id="map" class="enhanced-map" style="height: 600px; width: 100%;"></div>
             
             <!-- Map Controls -->
             <div class="map-controls">
               <div class="control-group">
-                <button @click="zoomIn" class="btn btn-light btn-sm" title="Zoom In">
+                <button @click="zoomIn" class="btn btn-light btn-lg shadow-sm me-2" title="Zoom In">
                   <i class="fas fa-plus"></i>
                 </button>
-                <button @click="zoomOut" class="btn btn-light btn-sm" title="Zoom Out">
+                <button @click="zoomOut" class="btn btn-light btn-lg shadow-sm me-2" title="Zoom Out">
                   <i class="fas fa-minus"></i>
                 </button>
-                <button @click="resetView" class="btn btn-light btn-sm" title="Reset View">
+                <button @click="resetView" class="btn btn-light btn-lg shadow-sm" title="Reset View">
                   <i class="fas fa-home"></i>
                 </button>
               </div>
@@ -263,23 +363,25 @@
 
             <!-- Map Legend -->
             <div class="map-legend">
-              <h6>Legend</h6>
+              <h6 class="fw-bold mb-3">
+                <i class="fas fa-info-circle me-2"></i>Legend
+              </h6>
               <div class="legend-items">
-                <div class="legend-item">
-                  <i class="fas fa-hospital" style="color: #dc3545"></i>
-                  <span>Hospitals</span>
+                <div class="legend-item mb-2 p-2 rounded bg-white bg-opacity-75">
+                  <i class="fas fa-hospital me-2" style="color: #dc3545; font-size: 1.1rem;"></i>
+                  <span class="fw-semibold">Hospitals</span>
                 </div>
-                <div class="legend-item">
-                  <i class="fas fa-clinic-medical" style="color: #28a745"></i>
-                  <span>Clinics</span>
+                <div class="legend-item mb-2 p-2 rounded bg-white bg-opacity-75">
+                  <i class="fas fa-clinic-medical me-2" style="color: #28a745; font-size: 1.1rem;"></i>
+                  <span class="fw-semibold">Clinics</span>
                 </div>
-                <div class="legend-item">
-                  <i class="fas fa-pills" style="color: #007bff"></i>
-                  <span>Pharmacies</span>
+                <div class="legend-item mb-2 p-2 rounded bg-white bg-opacity-75">
+                  <i class="fas fa-pills me-2" style="color: #007bff; font-size: 1.1rem;"></i>
+                  <span class="fw-semibold">Pharmacies</span>
                 </div>
-                <div class="legend-item">
-                  <i class="fas fa-ambulance" style="color: #ffc107"></i>
-                  <span>Emergency</span>
+                <div class="legend-item mb-2 p-2 rounded bg-white bg-opacity-75">
+                  <i class="fas fa-ambulance me-2" style="color: #ffc107; font-size: 1.1rem;"></i>
+                  <span class="fw-semibold">Emergency</span>
                 </div>
               </div>
             </div>
@@ -302,6 +404,17 @@
 </template>
 
 <script>
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+
+// Fix for default markers in Leaflet
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+})
+
 export default {
   name: 'HealthMap',
   data() {
@@ -316,6 +429,8 @@ export default {
       loading: false,
       loadingMessage: '',
       routeInfo: null,
+      sidebarOpen: false, // 控制移动端侧边栏显示
+      isMobile: false, // 检测是否为移动设备
       
       // Travel mode options
       travelModes: [
@@ -422,6 +537,8 @@ export default {
       ],
       
       markers: [],
+      userMarker: null,
+      routeLayer: null,
       directionsRenderer: null
     }
   },
@@ -445,88 +562,128 @@ export default {
     this.initializeMap()
     this.getCurrentLocation()
   },
-  
+
   methods: {
-    // Initialize the map (enhanced demo version)
+    // 检测移动设备
+    checkMobileDevice() {
+      this.isMobile = window.innerWidth <= 768
+    },
+    
+    // 处理窗口大小变化
+    handleResize() {
+      this.checkMobileDevice()
+      if (this.map) {
+        setTimeout(() => {
+          this.map.invalidateSize()
+        }, 100)
+      }
+    },
+    
+    // 切换侧边栏显示
+    toggleSidebar() {
+      this.sidebarOpen = !this.sidebarOpen
+    },
+    
+    // Initialize the map with Leaflet
     initializeMap() {
       this.loading = true
       this.loadingMessage = 'Loading interactive map...'
       
-      // Simulate map loading
-      setTimeout(() => {
-        // Create enhanced demo map interface
-        const mapElement = document.getElementById('map')
-        mapElement.innerHTML = `
-          <div class="enhanced-demo-map">
-            <div class="map-background"></div>
-            <div class="map-grid"></div>
-            
-            <!-- Animated markers for facilities -->
-            <div class="map-markers">
-              ${this.createDemoMarkers()}
-            </div>
-            
-            <!-- User location indicator -->
-            <div class="user-location-marker">
-              <div class="user-marker-pulse"></div>
-              <div class="user-marker-dot"></div>
-            </div>
-            
-            <!-- Map overlay with info -->
-            <div class="enhanced-map-overlay">
-              <div class="overlay-header">
-                <h4><i class="fas fa-map-marked-alt me-2"></i>Interactive Health Facilities Map</h4>
-                <span class="status-indicator online">
-                  <i class="fas fa-circle"></i> Live Data
-                </span>
-              </div>
-              <div class="overlay-content">
-                <p>Melbourne CBD & Surrounding Areas</p>
-                <div class="map-stats">
-                  <div class="stat">
-                    <span class="stat-number">${this.allFacilities.length}</span>
-                    <span class="stat-label">Total Facilities</span>
-                  </div>
-                  <div class="stat">
-                    <span class="stat-number">${this.searchRadius}km</span>
-                    <span class="stat-label">Search Radius</span>
-                  </div>
-                </div>
-                <small class="demo-note">
-                  <i class="fas fa-info-circle"></i>
-                  Interactive demo - In production, this would display a real Google Maps interface with live facility data
-                </small>
-              </div>
-            </div>
-          </div>
-        `
-        this.loading = false
-        this.searchNearbyFacilities()
-      }, 1500)
+      // Wait for DOM to be ready
+      this.$nextTick(() => {
+        try {
+          // Initialize Leaflet map centered on Melbourne
+          this.map = L.map('map').setView([-37.8136, 144.9631], 13)
+          
+          // Add OpenStreetMap tiles
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+          }).addTo(this.map)
+          
+          // Handle window resize to invalidate map size
+          window.addEventListener('resize', () => {
+            if (this.map) {
+              setTimeout(() => {
+                this.map.invalidateSize()
+              }, 100)
+            }
+          })
+          
+          // Add all facility markers to the map
+          this.addFacilityMarkers()
+          
+          this.loading = false
+          this.loadingMessage = ''
+        } catch (error) {
+          console.error('Error initializing map:', error)
+          this.loading = false
+          this.loadingMessage = 'Failed to load map'
+        }
+      })
     },
 
-    // Create demo markers for the map
-    createDemoMarkers() {
-      return this.allFacilities.map((facility, index) => {
-        const color = this.getFacilityColor(facility.type)
-        const icon = this.getFacilityIcon(facility.type)
-        const top = 20 + (index * 15) % 60
-        const left = 15 + (index * 20) % 70
+    // Add facility markers to the map
+    addFacilityMarkers() {
+      // Clear existing markers
+      this.clearMarkers()
+      
+      this.allFacilities.forEach(facility => {
+        // Create custom icon based on facility type
+        const icon = this.createCustomIcon(facility.type)
         
-        return `
-          <div class="demo-marker" 
-               style="top: ${top}%; left: ${left}%; --marker-color: ${color};"
-               data-facility-id="${facility.id}">
-            <div class="marker-icon">
-              <i class="${icon}"></i>
+        // Create marker
+        const marker = L.marker([facility.lat, facility.lng], { icon })
+          .addTo(this.map)
+          .bindPopup(`
+            <div class="facility-popup">
+              <h6><i class="${this.getFacilityIcon(facility.type)}"></i> ${facility.name}</h6>
+              <p class="mb-1">${facility.address}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge" style="background-color: ${this.getFacilityColor(facility.type)}">${facility.type}</span>
+                <span class="text-muted small">★ ${facility.rating}/5</span>
+              </div>
+              <p class="mb-1"><i class="fas fa-clock"></i> ${facility.hours}</p>
+              <button class="btn btn-primary btn-sm mt-2" onclick="window.selectFacilityFromMap(${facility.id})">
+                Select Facility
+              </button>
             </div>
-            <div class="marker-tooltip">
-              <strong>${facility.name}</strong><br>
-              <small>${facility.type} • ${facility.rating}/5</small>
-            </div>
+          `)
+        
+        // Store marker reference
+        this.markers.push(marker)
+        
+        // Add click event
+        marker.on('click', () => {
+          this.selectFacility(facility)
+        })
+      })
+    },
+
+    // Create custom icons for different facility types
+    createCustomIcon(type) {
+      const color = this.getFacilityColor(type)
+      const iconClass = this.getFacilityIcon(type)
+      
+      return L.divIcon({
+        className: 'custom-marker',
+        html: `
+          <div class="marker-pin" style="background-color: ${color};">
+            <i class="${iconClass}" style="color: white;"></i>
           </div>
-        `
-      }).join('')
+        `,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30]
+      })
+    },
+
+    // Clear all markers from map
+    clearMarkers() {
+      this.markers.forEach(marker => {
+        this.map.removeLayer(marker)
+      })
+      this.markers = []
     },
 
     // Enhanced facility color mapping
@@ -540,26 +697,230 @@ export default {
       return colors[type] || '#6c757d'
     },
     
-    // Get user's current location (demo version)
+    // 更新获取当前位置功能
     getCurrentLocation() {
       this.loading = true
       this.loadingMessage = 'Getting your location...'
       
-      // Simulate getting location
-      setTimeout(() => {
-        // Use Melbourne CBD as demo location
-        this.userLocation = {
-          lat: -37.8136,
-          lng: 144.9631
-        }
-        
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            this.userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            }
+            
+            if (this.map) {
+              // 添加用户位置标记
+              const userIcon = L.divIcon({
+                className: 'user-location-marker',
+                html: '<div class="user-marker-pulse"></div><div class="user-marker-dot"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+              })
+              
+              // 移除之前的用户位置标记
+              if (this.userMarker) {
+                this.map.removeLayer(this.userMarker)
+              }
+              
+              this.userMarker = L.marker([this.userLocation.lat, this.userLocation.lng], { icon: userIcon })
+                .addTo(this.map)
+                .bindPopup('Your Current Location')
+              
+              // 将地图中心设置为用户位置
+              this.map.setView([this.userLocation.lat, this.userLocation.lng], 15)
+            }
+            
+            this.loading = false
+            // 搜索附近的真实医疗设施
+            await this.searchRealMedicalFacilities()
+          },
+          (error) => {
+            console.error('Geolocation error:', error)
+            // 回退到墨尔本市中心
+            this.userLocation = { lat: -37.8136, lng: 144.9631 }
+            this.loading = false
+            this.searchNearbyFacilities() // 回退到示例数据
+            
+            let errorMessage = 'Unable to get your location. '
+            switch(error.code) {
+              case error.PERMISSION_DENIED:
+                errorMessage += 'Location access denied by user.'
+                break
+              case error.POSITION_UNAVAILABLE:
+                errorMessage += 'Location information unavailable.'
+                break
+              case error.TIMEOUT:
+                errorMessage += 'Location request timed out.'
+                break
+              default:
+                errorMessage += 'Unknown location error.'
+                break
+            }
+            alert(errorMessage + ' Using Melbourne CBD as default location.')
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000 // 5分钟缓存
+          }
+        )
+      } else {
+        // 地理位置不支持时回退到墨尔本CBD
+        this.userLocation = { lat: -37.8136, lng: 144.9631 }
         this.loading = false
         this.searchNearbyFacilities()
-      }, 500)
+        alert('Geolocation not supported by this browser. Using Melbourne CBD as default location.')
+      }
     },
     
-    // Search for location (demo version)
-    searchLocation() {
+    // 搜索附近设施（改进版，使用真实API数据）
+    async searchNearbyFacilities() {
+      try {
+        this.loading = true
+        this.loadingMessage = '正在搜索附近设施...'
+        this.clearMarkers()
+        
+        const center = this.userLocation || { lat: -37.8136, lng: 144.9631 }
+        const radiusMeters = this.searchRadius * 1000 // 转换为米
+        
+        // 构建 Overpass API 查询 - 搜索真实的医疗设施
+        let query = `[out:json][timeout:25];
+        (
+          node["amenity"~"^(hospital|clinic|doctors|dentist|pharmacy|veterinary)$"](around:${radiusMeters},${center.lat},${center.lng});
+          way["amenity"~"^(hospital|clinic|doctors|dentist|pharmacy|veterinary)$"](around:${radiusMeters},${center.lat},${center.lng});
+          relation["amenity"~"^(hospital|clinic|doctors|dentist|pharmacy|veterinary)$"](around:${radiusMeters},${center.lat},${center.lng});
+        );
+        out center;`
+        
+        // 如果选择了特定设施类型，添加过滤
+        if (this.facilityType) {
+          const facilityMap = {
+            'hospital': 'hospital',
+            'clinic': 'clinic|doctors',
+            'pharmacy': 'pharmacy',
+            'emergency': 'hospital' // 紧急服务通常在医院
+          }
+          
+          const osmAmenity = facilityMap[this.facilityType] || this.facilityType
+          query = `[out:json][timeout:25];
+          (
+            node["amenity"~"^(${osmAmenity})$"](around:${radiusMeters},${center.lat},${center.lng});
+            way["amenity"~"^(${osmAmenity})$"](around:${radiusMeters},${center.lat},${center.lng});
+            relation["amenity"~"^(${osmAmenity})$"](around:${radiusMeters},${center.lat},${center.lng});
+          );
+          out center;`
+        }
+        
+        const response = await fetch('https://overpass-api.de/api/interpreter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          },
+          body: 'data=' + encodeURIComponent(query)
+        })
+        
+        if (!response.ok) {
+          throw new Error('API请求失败')
+        }
+        
+        const data = await response.json()
+        
+        // 处理返回的真实数据
+        this.searchResults = data.elements
+          .filter(element => element.tags && element.tags.name) // 只显示有名称的设施
+          .map(element => {
+            // 确定坐标 - 处理不同类型的 OSM 元素
+            let facilityLat, facilityLng
+            if (element.lat && element.lon) {
+              facilityLat = element.lat
+              facilityLng = element.lon
+            } else if (element.center) {
+              facilityLat = element.center.lat
+              facilityLng = element.center.lon
+            } else {
+              return null
+            }
+            
+            // 计算距离
+            const distance = this.calculateDistance(center.lat, center.lng, facilityLat, facilityLng)
+            
+            // 映射 OSM amenity 到我们的类型
+            let facilityType = 'clinic' // 默认类型
+            const amenity = element.tags.amenity
+            if (amenity === 'hospital') facilityType = 'hospital'
+            else if (amenity === 'pharmacy') facilityType = 'pharmacy'
+            else if (amenity === 'clinic' || amenity === 'doctors') facilityType = 'clinic'
+            else if (amenity === 'dentist') facilityType = 'clinic'
+            else if (amenity === 'veterinary') facilityType = 'clinic'
+            
+            return {
+              id: element.id,
+              name: element.tags.name || '未命名设施',
+              type: facilityType,
+              address: this.formatAddress(element.tags),
+              lat: facilityLat,
+              lng: facilityLng,
+              distance: distance.toFixed(1),
+              rating: '4.' + Math.floor(Math.random() * 5), // 模拟评分
+              hours: element.tags.opening_hours || '营业时间未知',
+              phone: element.tags.phone || '电话未知',
+              website: element.tags.website || null,
+              services: this.getServicesForType(facilityType),
+              specialties: ['一般护理'],
+              isReal: true // 标记为真实数据
+            }
+          })
+          .filter(facility => facility !== null)
+          .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
+          .slice(0, 20) // 限制为前20个结果
+        
+        // 更新地图标记
+        if (this.map) {
+          this.addRealFacilityMarkers()
+        }
+        
+        console.log(`找到 ${this.searchResults.length} 个真实医疗设施`)
+        
+      } catch (error) {
+        console.error('搜索设施失败:', error)
+        
+        // 回退到示例数据
+        const center = this.userLocation || { lat: -37.8136, lng: 144.9631 }
+        
+        // 按类型过滤设施并计算距离
+        let filteredFacilities = this.allFacilities
+        
+        if (this.facilityType) {
+          filteredFacilities = filteredFacilities.filter(f => f.type === this.facilityType)
+        }
+        
+        // 计算距离并按半径过滤
+        this.searchResults = filteredFacilities
+          .map(facility => {
+            const distance = this.calculateDistance(
+              center.lat, center.lng,
+              facility.lat, facility.lng
+            )
+            return { ...facility, distance: distance.toFixed(1) }
+          })
+          .filter(facility => facility.distance <= this.searchRadius)
+          .sort((a, b) => a.distance - b.distance)
+        
+        // 更新地图标记
+        if (this.map) {
+          this.addFacilityMarkers()
+        }
+        
+        console.log('使用示例数据作为回退')
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    // 实际搜索地理位置功能 - 使用 Nominatim API
+    async searchLocation() {
       if (!this.searchQuery.trim()) {
         this.searchNearbyFacilities()
         return
@@ -568,220 +929,365 @@ export default {
       this.loading = true
       this.loadingMessage = 'Searching location...'
       
-      // Simulate geocoding
-      setTimeout(() => {
-        // For demo, just use a random nearby location
-        this.userLocation = {
-          lat: -37.8136 + (Math.random() - 0.5) * 0.01,
-          lng: 144.9631 + (Math.random() - 0.5) * 0.01
+      try {
+        // 使用 OpenStreetMap Nominatim 地理编码服务
+        const encodedQuery = encodeURIComponent(this.searchQuery + ', Melbourne, Australia')
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodedQuery}&limit=1&countrycodes=au`
+        )
+        
+        if (!response.ok) {
+          throw new Error('Search service unavailable')
         }
         
-        this.searchNearbyFacilities()
-        this.loading = false
-      }, 1000)
-    },
-    
-    // Search nearby facilities
-    searchNearbyFacilities() {
-      this.clearMarkers()
-      
-      const center = this.userLocation || { lat: -37.8136, lng: 144.9631 }
-      
-      // Filter facilities by type and calculate distances
-      let filteredFacilities = this.allFacilities
-      
-      if (this.facilityType) {
-        filteredFacilities = filteredFacilities.filter(f => f.type === this.facilityType)
-      }
-      
-      // Calculate distances and filter by radius
-      this.searchResults = filteredFacilities
-        .map(facility => {
-          const distance = this.calculateDistance(
-            center.lat, center.lng,
-            facility.lat, facility.lng
-          )
-          return { ...facility, distance: distance.toFixed(1) }
-        })
-        .filter(facility => facility.distance <= this.searchRadius)
-        .sort((a, b) => a.distance - b.distance)
-      
-      // Add markers to map
-      this.addMarkersToMap()
-    },
-    
-    // Add markers to map (enhanced demo version)
-    addMarkersToMap() {
-      // Update the map overlay with current search results
-      const mapElement = document.getElementById('map')
-      const overlay = mapElement.querySelector('.enhanced-map-overlay .overlay-content')
-      if (overlay) {
-        const statsHtml = `
-          <div class="map-stats">
-            <div class="stat">
-              <span class="stat-number">${this.searchResults.length}</span>
-              <span class="stat-label">Found Facilities</span>
-            </div>
-            <div class="stat">
-              <span class="stat-number">${this.searchRadius}km</span>
-              <span class="stat-label">Search Radius</span>
-            </div>
-          </div>
-          <div class="facility-breakdown">
-            <div class="breakdown-item">
-              <i class="fas fa-hospital" style="color: #dc3545"></i>
-              <span>${this.hospitalCount} Hospitals</span>
-            </div>
-            <div class="breakdown-item">
-              <i class="fas fa-clinic-medical" style="color: #28a745"></i>
-              <span>${this.clinicCount} Clinics</span>
-            </div>
-            <div class="breakdown-item">
-              <i class="fas fa-pills" style="color: #007bff"></i>
-              <span>${this.pharmacyCount} Pharmacies</span>
-            </div>
-            <div class="breakdown-item">
-              <i class="fas fa-ambulance" style="color: #ffc107"></i>
-              <span>${this.emergencyCount} Emergency</span>
-            </div>
-          </div>
-        `
+        const data = await response.json()
         
-        overlay.innerHTML = `
-          <p>Melbourne CBD & Surrounding Areas</p>
-          ${statsHtml}
-          <small class="demo-note">
-            <i class="fas fa-info-circle"></i>
-            Interactive demo - Click facilities in the sidebar to view details
-          </small>
-        `
+        if (data && data.length > 0) {
+          const result = data[0]
+          this.userLocation = {
+            lat: parseFloat(result.lat),
+            lng: parseFloat(result.lon)
+          }
+          
+          // 更新地图视图到搜索结果
+          if (this.map) {
+            this.map.setView([this.userLocation.lat, this.userLocation.lng], 14)
+            
+            // 添加搜索结果标记
+            const searchIcon = L.divIcon({
+              className: 'search-result-marker',
+              html: '<div class="search-pin"><i class="fas fa-search"></i></div>',
+              iconSize: [25, 25],
+              iconAnchor: [12, 25]
+            })
+            
+            L.marker([this.userLocation.lat, this.userLocation.lng], { icon: searchIcon })
+              .addTo(this.map)
+              .bindPopup(`<b>Search Result:</b><br>${result.display_name}`)
+              .openPopup()
+          }
+          
+          // 搜索附近的真实医疗设施
+          await this.searchRealMedicalFacilities()
+          
+        } else {
+          throw new Error('Location not found')
+        }
+        
+      } catch (error) {
+        console.error('Geocoding error:', error)
+        alert('Unable to find location. Please try a different search term.')
+        // 回退到默认位置
+        this.userLocation = { lat: -37.8136, lng: 144.9631 }
+        this.searchNearbyFacilities()
       }
-
-      // Add click handlers to demo markers
-      setTimeout(() => {
-        const markers = document.querySelectorAll('.demo-marker')
-        markers.forEach(marker => {
-          marker.addEventListener('click', (e) => {
-            const facilityId = parseInt(e.currentTarget.dataset.facilityId)
-            const facility = this.allFacilities.find(f => f.id === facilityId)
-            if (facility && this.searchResults.includes(facility)) {
-              this.selectFacility(facility)
+      
+      this.loading = false
+    },
+    
+    // 实际搜索真实医疗设施 - 使用 Overpass API
+    async searchRealMedicalFacilities() {
+      if (!this.userLocation) return
+      
+      this.loading = true
+      this.loadingMessage = 'Finding real medical facilities...'
+      
+      try {
+        const { lat, lng } = this.userLocation
+        const radiusMeters = this.searchRadius * 1000 // 转换为米
+        
+        // 构建 Overpass API 查询 - 搜索真实的医疗设施
+        let query = `[out:json][timeout:25];
+        (
+          node["amenity"~"^(hospital|clinic|doctors|dentist|pharmacy|veterinary)$"](around:${radiusMeters},${lat},${lng});
+          way["amenity"~"^(hospital|clinic|doctors|dentist|pharmacy|veterinary)$"](around:${radiusMeters},${lat},${lng});
+          relation["amenity"~"^(hospital|clinic|doctors|dentist|pharmacy|veterinary)$"](around:${radiusMeters},${lat},${lng});
+        );
+        out center;`
+        
+        // 如果选择了特定设施类型，添加过滤
+        if (this.facilityType) {
+          const facilityMap = {
+            'hospital': 'hospital',
+            'clinic': 'clinic|doctors',
+            'pharmacy': 'pharmacy',
+            'emergency': 'hospital' // 紧急服务通常在医院
+          }
+          
+          const osmAmenity = facilityMap[this.facilityType] || this.facilityType
+          query = `[out:json][timeout:25];
+          (
+            node["amenity"~"^(${osmAmenity})$"](around:${radiusMeters},${lat},${lng});
+            way["amenity"~"^(${osmAmenity})$"](around:${radiusMeters},${lat},${lng});
+            relation["amenity"~"^(${osmAmenity})$"](around:${radiusMeters},${lat},${lng});
+          );
+          out center;`
+        }
+        
+        const response = await fetch('https://overpass-api.de/api/interpreter', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          },
+          body: 'data=' + encodeURIComponent(query)
+        })
+        
+        if (!response.ok) {
+          throw new Error('Overpass API request failed')
+        }
+        
+        const data = await response.json()
+        
+        // 处理返回的真实数据
+        this.searchResults = data.elements
+          .filter(element => element.tags && element.tags.name) // 只显示有名称的设施
+          .map(element => {
+            // 确定坐标 - 处理不同类型的 OSM 元素
+            let facilityLat, facilityLng
+            if (element.lat && element.lon) {
+              facilityLat = element.lat
+              facilityLng = element.lon
+            } else if (element.center) {
+              facilityLat = element.center.lat
+              facilityLng = element.center.lon
+            } else {
+              return null
+            }
+            
+            // 计算距离
+            const distance = this.calculateDistance(lat, lng, facilityLat, facilityLng)
+            
+            // 映射 OSM amenity 到我们的类型
+            let facilityType = 'clinic' // 默认类型
+            const amenity = element.tags.amenity
+            if (amenity === 'hospital') facilityType = 'hospital'
+            else if (amenity === 'pharmacy') facilityType = 'pharmacy'
+            else if (amenity === 'clinic' || amenity === 'doctors') facilityType = 'clinic'
+            else if (amenity === 'dentist') facilityType = 'clinic'
+            else if (amenity === 'veterinary') facilityType = 'clinic'
+            
+            return {
+              id: element.id,
+              name: element.tags.name || 'Unnamed Facility',
+              type: facilityType,
+              address: this.formatAddress(element.tags),
+              lat: facilityLat,
+              lng: facilityLng,
+              distance: distance.toFixed(1),
+              rating: '4.' + Math.floor(Math.random() * 5), // 模拟评分
+              hours: element.tags.opening_hours || 'Hours not available',
+              phone: element.tags.phone || 'Phone not available',
+              website: element.tags.website || null,
+              services: this.getServicesForType(facilityType),
+              specialties: ['General Care'],
+              isReal: true // 标记为真实数据
             }
           })
+          .filter(facility => facility !== null)
+          .sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance))
+          .slice(0, 20) // 限制为前20个结果
+        
+        // 更新地图标记
+        if (this.map) {
+          this.addRealFacilityMarkers()
+        }
+        
+        console.log(`Found ${this.searchResults.length} real medical facilities`)
+        
+      } catch (error) {
+        console.error('Error searching real facilities:', error)
+        // 回退到示例数据
+        this.searchNearbyFacilities()
+        alert('Unable to load real facility data. Showing sample facilities instead.')
+      }
+      
+      this.loading = false
+    },
+    
+    // 格式化地址信息
+    formatAddress(tags) {
+      const parts = []
+      if (tags['addr:housenumber']) parts.push(tags['addr:housenumber'])
+      if (tags['addr:street']) parts.push(tags['addr:street'])
+      if (tags['addr:suburb']) parts.push(tags['addr:suburb'])
+      if (tags['addr:city']) parts.push(tags['addr:city'])
+      if (tags['addr:postcode']) parts.push(tags['addr:postcode'])
+      
+      if (parts.length > 0) {
+        return parts.join(' ')
+      }
+      
+      // 如果没有详细地址，使用其他可用信息
+      return tags.address || 'Address not available'
+    },
+    
+    // 为设施类型获取服务
+    getServicesForType(type) {
+      const serviceMap = {
+        hospital: ['Emergency Care', 'Surgery', 'Inpatient Care', 'Specialist Consultations'],
+        clinic: ['General Practice', 'Consultations', 'Health Checks', 'Vaccinations'],
+        pharmacy: ['Prescriptions', 'Medications', 'Health Products', 'Consultations'],
+        emergency: ['Emergency Response', 'Urgent Care', '24/7 Service']
+      }
+      return serviceMap[type] || ['General Medical Services']
+    },
+    
+    // 添加真实设施标记到地图
+    addRealFacilityMarkers() {
+      // 清除现有标记
+      this.clearMarkers()
+      
+      this.searchResults.forEach(facility => {
+        // 创建自定义图标
+        const icon = this.createCustomIcon(facility.type)
+        
+        // 创建标记
+        const marker = L.marker([facility.lat, facility.lng], { icon })
+          .addTo(this.map)
+          .bindPopup(`
+            <div class="facility-popup">
+              <h6><i class="${this.getFacilityIcon(facility.type)}"></i> ${facility.name}</h6>
+              <p class="mb-1">${facility.address}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="badge" style="background-color: ${this.getFacilityColor(facility.type)}">${facility.type}</span>
+                <span class="text-muted small">★ ${facility.rating}/5</span>
+              </div>
+              <p class="mb-1"><i class="fas fa-route"></i> ${facility.distance}km away</p>
+              <p class="mb-1"><i class="fas fa-clock"></i> ${facility.hours}</p>
+              ${facility.phone !== 'Phone not available' ? `<p class="mb-1"><i class="fas fa-phone"></i> ${facility.phone}</p>` : ''}
+              ${facility.website ? `<p class="mb-1"><a href="${facility.website}" target="_blank"><i class="fas fa-globe"></i> Website</a></p>` : ''}
+              <div class="mt-2">
+                <button class="btn btn-primary btn-sm me-2" onclick="window.selectFacilityFromMap(${facility.id})">
+                  Select
+                </button>
+                <button class="btn btn-success btn-sm" onclick="window.getDirectionsFromMap(${facility.id})">
+                  Directions
+                </button>
+              </div>
+            </div>
+          `)
+        
+        // 存储标记引用
+        this.markers.push(marker)
+        
+        // 添加点击事件
+        marker.on('click', () => {
+          this.selectFacility(facility)
         })
-      }, 100)
+      })
     },
     
-    // Clear all markers (demo version)
-    clearMarkers() {
-      // In demo mode, just reset the overlay
-      this.addMarkersToMap()
-    },
-    
-    // Select a facility (enhanced version)
+    // Select a facility
     selectFacility(facility) {
       this.selectedFacility = facility
       
-      // Update map overlay with selected facility info
-      const mapElement = document.getElementById('map')
-      const overlay = mapElement.querySelector('.enhanced-map-overlay .overlay-content')
-      if (overlay) {
-        overlay.innerHTML = `
-          <div class="selected-facility-info">
-            <div class="facility-header">
-              <div class="facility-icon-large">
-                <i class="${this.getFacilityIcon(facility.type)}" 
-                   style="color: ${this.getFacilityColor(facility.type)}"></i>
-              </div>
-              <div class="facility-details">
-                <h5>${facility.name}</h5>
-                <p class="text-muted">${facility.address}</p>
-                <div class="facility-badges">
-                  <span class="badge" style="background-color: ${this.getFacilityColor(facility.type)}">
-                    ${facility.type}
-                  </span>
-                  <span class="badge bg-success">
-                    <i class="fas fa-star"></i> ${facility.rating}/5
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="facility-info-grid">
-              <div class="info-item">
-                <i class="fas fa-clock text-primary"></i>
-                <span>${facility.hours}</span>
-              </div>
-              <div class="info-item">
-                <i class="fas fa-phone text-success"></i>
-                <span>${facility.phone}</span>
-              </div>
-              <div class="info-item">
-                <i class="fas fa-route text-info"></i>
-                <span>${facility.distance}km away</span>
-              </div>
-            </div>
-            
-            <div class="services-preview">
-              <strong>Services:</strong>
-              <div class="services-tags">
-                ${facility.services.slice(0, 3).map(service => 
-                  `<span class="service-tag">${service}</span>`
-                ).join('')}
-                ${facility.services.length > 3 ? 
-                  `<span class="service-tag more">+${facility.services.length - 3} more</span>` : ''
-                }
-              </div>
-            </div>
-          </div>
-          
-          <small class="demo-note">
-            <i class="fas fa-info-circle"></i>
-            Use the navigation panel to get directions to this facility
-          </small>
-        `
+      if (this.map) {
+        // Center map on selected facility
+        this.map.setView([facility.lat, facility.lng], 16)
+        
+        // Open the popup for this facility
+        this.markers.forEach(marker => {
+          const markerFacility = this.allFacilities.find(f => 
+            f.lat === marker.getLatLng().lat && f.lng === marker.getLatLng().lng
+          )
+          if (markerFacility && markerFacility.id === facility.id) {
+            marker.openPopup()
+          }
+        })
       }
-      
-      // Highlight selected marker
-      const markers = document.querySelectorAll('.demo-marker')
-      markers.forEach(marker => {
-        marker.classList.remove('selected')
-        if (parseInt(marker.dataset.facilityId) === facility.id) {
-          marker.classList.add('selected')
-        }
-      })
       
       // Clear previous directions
       this.routeInfo = null
     },
     
-    // Get directions (enhanced demo version)
-    getDirections() {
+    // 真实路线规划功能 - 使用 OSRM API
+    async getDirections() {
       if (!this.selectedFacility) {
         alert('Please select a facility first!')
         return
       }
       
-      this.loading = true
-      this.loadingMessage = 'Calculating route...'
+      if (!this.userLocation) {
+        alert('Unable to get your location. Please enable location services.')
+        return
+      }
       
-      // Simulate route calculation with enhanced details
-      setTimeout(() => {
-        const distance = Math.round(parseFloat(this.selectedFacility.distance) * 10) / 10
+      this.loading = true
+      this.loadingMessage = 'Calculating real route...'
+      
+      try {
+        const start = `${this.userLocation.lng},${this.userLocation.lat}`
+        const end = `${this.selectedFacility.lng},${this.selectedFacility.lat}`
+        
+        // 映射出行方式到 OSRM 配置文件
+        const profileMap = {
+          'driving': 'driving',
+          'walking': 'foot',
+          'bicycling': 'bike'
+        }
+        const profile = profileMap[this.travelMode] || 'driving'
+        
+        // 使用 OSRM (Open Source Routing Machine) API 计算真实路线
+        const response = await fetch(
+          `https://router.project-osrm.org/route/v1/${profile}/${start};${end}?overview=full&geometries=geojson&steps=true`
+        )
+        
+        if (!response.ok) {
+          throw new Error('Routing service unavailable')
+        }
+        
+        const data = await response.json()
+        
+        if (data.routes && data.routes.length > 0) {
+          const route = data.routes[0]
+          
+          // 提取路线信息
+          const distanceKm = (route.distance / 1000).toFixed(1)
+          const durationMin = Math.round(route.duration / 60)
+          
+          // 提取转向指示
+          const steps = route.legs[0].steps.map(step => {
+            const instruction = step.maneuver.instruction || 'Continue'
+            const distance = (step.distance / 1000).toFixed(1)
+            return `${instruction} (${distance}km)`
+          }).slice(0, 8) // 限制步骤数量
+          
+          this.routeInfo = {
+            distance: `${distanceKm}km`,
+            duration: `${durationMin} min`,
+            mode: this.travelMode,
+            steps: steps,
+            geometry: route.geometry // 保存几何信息用于绘制路线
+          }
+          
+          // 在地图上绘制路线
+          this.drawRouteOnMap(route.geometry)
+          
+          console.log('Real route calculated successfully')
+          
+        } else {
+          throw new Error('No route found')
+        }
+        
+      } catch (error) {
+        console.error('Error calculating route:', error)
+        
+        // 回退到估算路线
+        const distance = parseFloat(this.selectedFacility.distance)
         let duration
         
         switch (this.travelMode) {
           case 'walking':
-            duration = Math.round(distance * 12) // 12 minutes per km
+            duration = Math.round(distance * 12) // 12分钟/公里
             break
           case 'bicycling':
-            duration = Math.round(distance * 4) // 4 minutes per km
+            duration = Math.round(distance * 4) // 4分钟/公里
             break
           case 'transit':
-            duration = Math.round(distance * 6) // 6 minutes per km
+            duration = Math.round(distance * 6) // 6分钟/公里
             break
           default: // driving
-            duration = Math.round(distance * 3) // 3 minutes per km
+            duration = Math.round(distance * 3) // 3分钟/公里
         }
         
         this.routeInfo = {
@@ -789,15 +1295,40 @@ export default {
           duration: `${duration} min`,
           mode: this.travelMode,
           steps: [
-            'Head north on current street',
-            `Turn right towards ${this.selectedFacility.address.split(',')[0]}`,
-            `Continue straight for ${(distance * 0.7).toFixed(1)}km`,
-            `Arrive at ${this.selectedFacility.name}`
-          ]
+            'Route calculation failed - showing estimated directions',
+            `Head towards ${this.selectedFacility.name}`,
+            `Travel approximately ${distance}km`,
+            `Arrive at destination`
+          ],
+          isEstimated: true
         }
         
-        this.loading = false
-      }, 1000)
+        alert('Unable to calculate exact route. Showing estimated directions.')
+      }
+      
+      this.loading = false
+    },
+    
+    // 在地图上绘制路线
+    drawRouteOnMap(geometry) {
+      // 移除之前的路线
+      if (this.routeLayer) {
+        this.map.removeLayer(this.routeLayer)
+      }
+      
+      // 绘制新路线
+      this.routeLayer = L.geoJSON(geometry, {
+        style: {
+          color: '#3388ff',
+          weight: 5,
+          opacity: 0.8,
+          dashArray: '10, 5'
+        }
+      }).addTo(this.map)
+      
+      // 调整地图视图以包含整条路线
+      const bounds = this.routeLayer.getBounds()
+      this.map.fitBounds(bounds, { padding: [20, 20] })
     },
     
     // Start navigation (opens in external app)
@@ -839,62 +1370,233 @@ export default {
       return R * c
     },
     
-    // Map control methods (demo version)
+    // Map control methods
     zoomIn() {
-      const overlay = document.querySelector('.enhanced-map-overlay')
-      if (overlay) {
-        const info = document.createElement('div')
-        info.className = 'zoom-info'
-        info.innerHTML = '<small>Zoom In activated</small>'
-        overlay.appendChild(info)
-        setTimeout(() => info.remove(), 2000)
+      if (this.map) {
+        this.map.zoomIn()
       }
     },
     
     zoomOut() {
-      const overlay = document.querySelector('.enhanced-map-overlay')
-      if (overlay) {
-        const info = document.createElement('div')
-        info.className = 'zoom-info'
-        info.innerHTML = '<small>Zoom Out activated</small>'
-        overlay.appendChild(info)
-        setTimeout(() => info.remove(), 2000)
+      if (this.map) {
+        this.map.zoomOut()
       }
     },
     
     resetView() {
-      this.initializeMap()
-      this.searchNearbyFacilities()
+      if (this.map) {
+        const center = this.userLocation || { lat: -37.8136, lng: 144.9631 }
+        this.map.setView([center.lat, center.lng], 13)
+      }
+    },
+
+    // 全局函数设置 - 为地图弹窗按钮提供支持
+    setupGlobalFunctions() {
+      window.selectFacilityFromMap = (facilityId) => {
+        const facility = this.searchResults.find(f => f.id === facilityId) || 
+                         this.allFacilities.find(f => f.id === facilityId)
+        if (facility) {
+          this.selectFacility(facility)
+        }
+      }
+      
+      // 新增：从地图直接获取导航功能
+      window.getDirectionsFromMap = (facilityId) => {
+        const facility = this.searchResults.find(f => f.id === facilityId) || 
+                         this.allFacilities.find(f => f.id === facilityId)
+        if (facility) {
+          this.selectFacility(facility)
+          // 延迟执行获取路线，确保设施已选中
+          setTimeout(() => {
+            this.getDirections()
+          }, 100)
+        }
+      }
+    },
+    
+    // 改进的启动导航功能
+    startNavigation() {
+      if (!this.selectedFacility) {
+        alert('Please select a facility first.')
+        return
+      }
+      
+      const destination = `${this.selectedFacility.lat},${this.selectedFacility.lng}`
+      const facilityName = encodeURIComponent(this.selectedFacility.name)
+      
+      // 检测用户设备并提供相应的导航选项
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      
+      if (isMobile) {
+        // 移动设备：提供多个导航应用选项
+        const options = [
+          {
+            name: 'Google Maps',
+            url: `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=${this.travelMode}`
+          },
+          {
+            name: 'Apple Maps',
+            url: `http://maps.apple.com/?daddr=${destination}&t=m`
+          },
+          {
+            name: 'Waze',
+            url: `https://waze.com/ul?ll=${destination}&navigate=yes`
+          }
+        ]
+        
+        // 创建选择对话框
+        const choice = confirm(`Open navigation in external app?\n\nClick OK for Google Maps\nClick Cancel to choose from other options`)
+        
+        if (choice) {
+          window.open(options[0].url, '_blank')
+        } else {
+          // 显示所有选项
+          let message = 'Choose your navigation app:\n\n'
+          options.forEach((option, index) => {
+            message += `${index + 1}. ${option.name}\n`
+          })
+          
+          const selection = prompt(message + '\nEnter number (1-3):')
+          const selectedIndex = parseInt(selection) - 1
+          
+          if (selectedIndex >= 0 && selectedIndex < options.length) {
+            window.open(options[selectedIndex].url, '_blank')
+          }
+        }
+      } else {
+        // 桌面设备：直接打开 Google Maps
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=${this.travelMode}`
+        window.open(url, '_blank')
+      }
+    },
+    
+    // 新增：分享位置功能
+    shareFacilityLocation() {
+      if (!this.selectedFacility) {
+        alert('Please select a facility first.')
+        return
+      }
+      
+      const shareText = `Check out this medical facility: ${this.selectedFacility.name}\nAddress: ${this.selectedFacility.address}\nDistance: ${this.selectedFacility.distance}km away`
+      const shareUrl = `https://www.google.com/maps/search/?api=1&query=${this.selectedFacility.lat},${this.selectedFacility.lng}`
+      
+      if (navigator.share) {
+        // 使用原生分享API（移动设备）
+        navigator.share({
+          title: this.selectedFacility.name,
+          text: shareText,
+          url: shareUrl
+        }).catch(console.error)
+      } else {
+        // 回退到复制到剪贴板
+        const fullText = `${shareText}\nLocation: ${shareUrl}`
+        
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(fullText).then(() => {
+            alert('Facility information copied to clipboard!')
+          }).catch(() => {
+            this.fallbackCopyToClipboard(fullText)
+          })
+        } else {
+          this.fallbackCopyToClipboard(fullText)
+        }
+      }
+    },
+    
+    // 回退复制功能
+    fallbackCopyToClipboard(text) {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.select()
+      try {
+        document.execCommand('copy')
+        alert('Facility information copied to clipboard!')
+      } catch (err) {
+        alert('Unable to copy to clipboard. Please copy manually:\n\n' + text)
+      }
+      document.body.removeChild(textArea)
     }
+  },
+
+  mounted() {
+    this.setupGlobalFunctions()
+    this.checkMobileDevice()
+    this.initializeMap()
+    this.getCurrentLocation()
+    
+    // 初始化时显示示例设施（等待位置获取后再搜索真实设施）
+    setTimeout(() => {
+      this.searchNearbyFacilities()
+    }, 2000) // 给获取位置留出时间
+    
+    // 监听窗口大小变化
+    window.addEventListener('resize', this.handleResize)
+  },
+
+  beforeUnmount() {
+    // 清理地图实例和事件监听器
+    if (this.map) {
+      this.map.remove()
+    }
+    window.removeEventListener('resize', this.handleResize)
   }
 }
 </script>
 
 <style scoped>
 .health-map {
-  height: 100vh;
-  overflow: hidden;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+.health-map::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+  pointer-events: none;
 }
 
 .sidebar {
   height: 100vh;
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1;
 }
 
-.sidebar-content {
-  padding: 1rem;
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .map-header {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 2;
 }
 
 .map-container {
@@ -905,6 +1607,101 @@ export default {
 .map-wrapper {
   height: 100%;
   padding: 1rem;
+}
+
+/* Leaflet Map Styles */
+.enhanced-map {
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Custom Marker Styles */
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+.marker-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  position: relative;
+  transform: rotate(-45deg);
+  border: 2px solid white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marker-pin i {
+  transform: rotate(45deg);
+  font-size: 14px;
+}
+
+/* User Location Marker */
+.user-location-marker {
+  position: relative;
+}
+
+.user-marker-pulse {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.3);
+  animation: pulse 2s infinite;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.user-marker-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: 2px solid white;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Facility Popup Styles */
+.facility-popup {
+  min-width: 250px;
+}
+
+.facility-popup h6 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.facility-popup .badge {
+  font-size: 0.75em;
+  padding: 4px 8px;
+}
+
+.facility-popup .btn {
+  width: 100%;
+  margin-top: 8px;
 }
 
 /* Enhanced Card Styles */
@@ -1035,57 +1832,163 @@ export default {
   border-left: 4px solid #2196f3;
 }
 
-/* Demo Markers */
-.demo-marker {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  background: var(--marker-color, #ff4444);
+/* Search Result Marker */
+.search-result-marker {
+  background: transparent;
+  border: none;
+}
+
+.search-pin {
+  width: 25px;
+  height: 25px;
+  background: #28a745;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-pin i {
+  transform: rotate(45deg);
+  color: white;
+  font-size: 12px;
+}
+
+/* Route Steps Styling */
+.route-steps {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.route-steps::-webkit-scrollbar {
+  width: 4px;
+}
+
+.route-steps::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.route-steps::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.step-item {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.step-item:hover {
+  border-left-color: #007bff;
+  background: rgba(0, 123, 255, 0.1) !important;
+}
+
+.step-number {
+  font-size: 0.7rem;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-text {
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+/* Loading Animation Improvements */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.loading-content {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  max-width: 300px;
+}
+
+/* Enhanced Button Styles */
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
   transition: all 0.3s ease;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-  z-index: 2;
+  border: none;
+  position: relative;
+  overflow: hidden;
 }
 
-.demo-marker:hover {
-  transform: rotate(-45deg) scale(1.1);
-}
-
-.demo-marker.selected {
-  background: #4CAF50 !important;
-  transform: rotate(-45deg) scale(1.2);
-  z-index: 3;
-}
-
-.marker-icon {
+.btn-lg::before {
+  content: '';
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) rotate(45deg);
-  color: white;
-  font-size: 0.8rem;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
 }
 
-.marker-tooltip {
+.btn-lg:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-lg:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Real Data Indicator */
+.facility-item[data-real="true"] {
+  border-left: 4px solid #28a745;
+}
+
+.facility-item[data-real="true"]::after {
+  content: 'REAL';
   position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
+  top: 8px;
+  right: 8px;
+  background: #28a745;
   color: white;
-  padding: 0.5rem;
-  border-radius: 5px;
-  font-size: 0.7rem;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 0.6rem;
+  font-weight: bold;
 }
 
-.demo-marker:hover .marker-tooltip {
-  opacity: 1;
+/* Route Line Animation */
+.leaflet-interactive {
+  animation: routeAnimation 2s ease-in-out;
+}
+
+@keyframes routeAnimation {
+  0% {
+    stroke-dashoffset: 100%;
+  }
+  100% {
+    stroke-dashoffset: 0%;
+  }
 }
 
 /* Facility Items */
@@ -1256,13 +2159,39 @@ export default {
   position: absolute;
   top: 20px;
   right: 20px;
-  z-index: 10;
+  z-index: 1000;
 }
 
 .control-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 0.75rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.control-group .btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #667eea;
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-group .btn:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
 .map-legend {
@@ -1270,11 +2199,12 @@ export default {
   bottom: 20px;
   left: 20px;
   background: rgba(255, 255, 255, 0.95);
-  padding: 1rem;
-  border-radius: 10px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  padding: 1.5rem;
+  border-radius: 15px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-width: 200px;
 }
 
 .legend-items {
@@ -1287,8 +2217,17 @@ export default {
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   font-size: 0.9rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.legend-item:hover {
+  background: rgba(102, 126, 234, 0.1);
+  transform: translateX(4px);
 }
 
 /* Loading Overlay */
@@ -1424,6 +2363,114 @@ export default {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .health-map {
+    min-height: 100vh;
+  }
+  
+  .sidebar {
+    height: auto;
+    max-height: 50vh;
+    order: 2;
+  }
+  
+  .map-container {
+    height: 50vh;
+    order: 1;
+  }
+  
+  .map-wrapper {
+    padding: 1rem !important;
+  }
+  
+  .enhanced-map {
+    height: 400px !important;
+    border-radius: 15px;
+  }
+  
+  .travel-modes {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.5rem;
+  }
+  
+  .travel-mode-option {
+    padding: 0.75rem 0.5rem !important;
+  }
+  
+  .mode-icon {
+    font-size: 1.2rem !important;
+  }
+  
+  .mode-label {
+    font-size: 0.7rem !important;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.5rem;
+  }
+  
+  .stat-item {
+    padding: 1rem 0.5rem !important;
+  }
+  
+  .stat-number {
+    font-size: 1.5rem !important;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem !important;
+  }
+  
+  .map-controls {
+    top: 10px;
+    right: 10px;
+  }
+  
+  .control-group {
+    padding: 0.5rem;
+  }
+  
+  .control-group .btn {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1rem !important;
+  }
+  
+  .map-legend {
+    bottom: 10px;
+    left: 10px;
+    padding: 1rem;
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 576px) {
+  .map-header .container-fluid .row {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .enhanced-map {
+    height: 300px !important;
+  }
+  
+  .sidebar-content {
+    padding: 1rem !important;
+  }
+  
+  .search-card .card-body,
+  .navigation-card .card-body,
+  .stats-card .card-body {
+    padding: 1.5rem !important;
+  }
+  
+  .facility-item {
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
   .sidebar {
     position: fixed;
     left: -100%;
@@ -1444,18 +2491,115 @@ export default {
   .stats-grid {
     grid-template-columns: 1fr;
   }
-  
-  .facility-breakdown {
-    grid-template-columns: 1fr;
+}
+
+/* Mobile Sidebar Toggle Button */
+.mobile-sidebar-toggle {
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: none;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.mobile-sidebar-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-sidebar-toggle.active {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+
+/* Mobile responsive styles - 修复响应式布局 */
+@media (max-width: 768px) {
+  .mobile-sidebar-toggle {
+    display: flex !important;
   }
   
-  .travel-modes {
-    grid-template-columns: repeat(2, 1fr);
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 85%;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
   }
   
-  .map-stats {
-    flex-direction: column;
-    gap: 1rem;
+  .sidebar.open {
+    left: 0;
   }
+  
+  .map-container {
+    width: 100% !important;
+    height: 100vh !important;
+  }
+  
+  .col-lg-4, .col-md-5 {
+    flex: none;
+    width: auto;
+  }
+  
+  .col-lg-8, .col-md-7 {
+    flex: none;
+    width: 100%;
+  }
+}
+
+/* 确保桌面版本侧边栏始终可见 */
+@media (min-width: 769px) {
+  .mobile-sidebar-toggle {
+    display: none !important;
+  }
+  
+  .sidebar {
+    position: relative !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100vh !important;
+    z-index: 1 !important;
+  }
+  
+  .col-lg-4, .col-md-5 {
+    flex: 0 0 33.333333% !important;
+    max-width: 33.333333% !important;
+  }
+  
+  .col-lg-8, .col-md-7 {
+    flex: 0 0 66.666667% !important;
+    max-width: 66.666667% !important;
+  }
+}
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
 }
 </style>

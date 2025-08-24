@@ -1,0 +1,249 @@
+/* ==========================================
+   WCAG 2.1 AA级别无障碍CSS样式
+   ========================================== */
+
+/* Skip Links - 跳过链接 */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #000;
+  color: #fff;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 9999;
+  border-radius: 0 0 4px 4px;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* 焦点指示器增强 */
+*:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* 移除默认的焦点样式，但保持功能 */
+*:focus {
+  outline: none;
+}
+
+/* 确保按钮和链接有明显的焦点状态 */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #0066cc;
+  outline-offset: 2px;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .btn {
+    border: 2px solid;
+    font-weight: bold;
+  }
+  
+  .card {
+    border: 2px solid #333;
+  }
+  
+  .form-control,
+  .form-select {
+    border: 2px solid #333;
+  }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 屏幕阅读器专用内容 */
+.sr-only,
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* 确保必填字段标识清晰 */
+.required-field::after {
+  content: " *";
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* 错误状态样式 */
+.form-control[aria-invalid="true"],
+.form-select[aria-invalid="true"] {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+}
+
+/* 成功状态样式 */
+.form-control[aria-invalid="false"],
+.form-select[aria-invalid="false"] {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+}
+
+/* Loading状态的无障碍改进 */
+.loading-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  border-right-color: transparent;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 确保按钮有足够的点击区域 */
+.btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* 链接的无障碍改进 */
+a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* 确保图标有适当的样式 */
+i[class*="fa-"],
+.icon {
+  display: inline-block;
+}
+
+/* 表格无障碍 */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  font-weight: bold;
+}
+
+/* 模态框无障碍 */
+.modal {
+  display: none;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* 确保对比度符合WCAG标准 */
+.text-muted {
+  color: #6c757d !important; /* 4.5:1 对比度 */
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+  color: #212529 !important; /* 确保文本对比度 */
+}
+
+/* 工具提示无障碍 */
+[data-bs-toggle="tooltip"] {
+  cursor: help;
+}
+
+/* 标签页无障碍 */
+.nav-tabs .nav-link[aria-selected="true"] {
+  font-weight: bold;
+}
+
+/* 分页无障碍 */
+.pagination .page-link {
+  color: #0066cc;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #0066cc;
+  border-color: #0066cc;
+  color: white;
+  font-weight: bold;
+}
+
+/* 警告和错误消息 */
+.alert {
+  border-left: 4px solid;
+}
+
+.alert-danger {
+  border-left-color: #dc3545;
+}
+
+.alert-warning {
+  border-left-color: #ffc107;
+}
+
+.alert-success {
+  border-left-color: #28a745;
+}
+
+.alert-info {
+  border-left-color: #17a2b8;
+}
+
+/* 响应式文本大小 */
+@media (max-width: 576px) {
+  body {
+    font-size: 16px; /* 防止iOS缩放 */
+  }
+}
+
+/* 打印样式 */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bs-body-bg: #1a1a1a;
+    --bs-body-color: #ffffff;
+  }
+}

@@ -1,46 +1,66 @@
-、<template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+<template>
+  <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm" role="navigation" aria-label="主导航">
     <div class="container">
-      <router-link class="navbar-brand d-flex align-items-center" to="/">
-        <img src="../assets/logo.svg" alt="Healthy Pathway" class="nav-logo me-2" />
+      <router-link class="navbar-brand d-flex align-items-center" to="/" aria-label="回到首页 - Healthy Pathway">
+        <img src="../assets/logo.svg" alt="Healthy Pathway 标志" class="nav-logo me-2" />
         <span class="brand-text">Healthy Pathway</span>
       </router-link>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
-              data-bs-target="#navbarNav" aria-controls="navbarNav" 
-              aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+      <button 
+        class="navbar-toggler" 
+        type="button" 
+        data-bs-toggle="collapse" 
+        data-bs-target="#navbarNav" 
+        aria-controls="navbarNav" 
+        aria-expanded="false" 
+        aria-label="展开或收起导航菜单"
+        @click="toggleMobileMenu"
+        :aria-expanded="mobileMenuOpen"
+      >
+        <span class="navbar-toggler-icon" aria-hidden="true"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+      <div class="collapse navbar-collapse" id="navbarNav" :class="{ show: mobileMenuOpen }">
+        <ul class="navbar-nav ms-auto" role="menubar">
           <!-- 通用导航链接 -->
-          <li class="nav-item">
-            <router-link class="nav-link" to="/">Home</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/health-articles">
-              <i class="fas fa-newspaper me-1"></i>Health Articles
+          <li class="nav-item" role="none">
+            <router-link class="nav-link" to="/" role="menuitem" aria-current="page">
+              <i class="fas fa-home me-1" aria-hidden="true"></i>
+              首页
             </router-link>
           </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/health-map">
-              <i class="fas fa-map-marked-alt me-1"></i>Health Map
+          <li class="nav-item" role="none">
+            <router-link class="nav-link" to="/health-articles" role="menuitem">
+              <i class="fas fa-newspaper me-1" aria-hidden="true"></i>
+              健康资讯
             </router-link>
           </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/email-demo">
-              <i class="fas fa-envelope me-1"></i>Email Demo
+          <li class="nav-item" role="none">
+            <router-link class="nav-link" to="/health-map" role="menuitem">
+              <i class="fas fa-map-marked-alt me-1" aria-hidden="true"></i>
+              健康地图
+            </router-link>
+          </li>
+          <li class="nav-item" role="none">
+            <router-link class="nav-link" to="/email-demo" role="menuitem">
+              <i class="fas fa-envelope me-1" aria-hidden="true"></i>
+              邮件演示
             </router-link>
           </li>
           
           <template v-if="!isAuthenticated">
             <!-- 未登录用户显示的链接 -->
-            <li class="nav-item">
-              <router-link class="nav-link" to="/login">Login</router-link>
+            <li class="nav-item" role="none">
+              <router-link class="nav-link" to="/login" role="menuitem">
+                <i class="fas fa-sign-in-alt me-1" aria-hidden="true"></i>
+                登录
+              </router-link>
             </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/register">Register</router-link>
+            <li class="nav-item" role="none">
+              <router-link class="nav-link btn btn-primary text-white ms-2 px-3" to="/register" role="menuitem">
+                <i class="fas fa-user-plus me-1" aria-hidden="true"></i>
+                注册
+              </router-link>
             </li>
           </template>
           
@@ -67,12 +87,20 @@
 </template>
 
 <script setup>
-import { computed, onMounted, nextTick, watch } from 'vue'
+import { computed, onMounted, nextTick, watch, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+// 移动菜单状态
+const mobileMenuOpen = ref(false)
+
+// 切换移动菜单
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
 
 // 使用computed来响应认证状态变化
 const isAuthenticated = computed(() => {
