@@ -79,7 +79,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Modal } from 'bootstrap'
+import * as bootstrap from 'bootstrap'
 
 // 模拟文章数据
 const articles = ref([
@@ -138,7 +138,7 @@ const readMore = (article) => {
 }
 
 onMounted(() => {
-  articleModal.value = new Modal(document.getElementById('articleModal'))
+  articleModal.value = new bootstrap.Modal(document.getElementById('articleModal'))
 })
 </script>
 

@@ -9,6 +9,7 @@ import HealthMap from '../pages/HealthMap.vue';
 import DoctorRating from '../pages/DoctorRating.vue';
 import AdminPanel from '../pages/AdminPanel.vue';
 import AccessibilityDemo from '../pages/AccessibilityDemo.vue';
+import AppointmentBooking from '../pages/AppointmentBooking.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -32,6 +33,12 @@ const routes = [
     path: '/accessibility-demo', 
     name: 'AccessibilityDemo', 
     component: AccessibilityDemo,
+    meta: { requiresAuth: false }
+  },
+  { 
+    path: '/appointment-booking', 
+    name: 'AppointmentBooking', 
+    component: AppointmentBooking,
     meta: { requiresAuth: false }
   },
   { 

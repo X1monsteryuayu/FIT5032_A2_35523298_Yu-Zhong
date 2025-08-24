@@ -259,7 +259,7 @@
 import { ref, computed, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store'
-import { Modal } from 'bootstrap'
+import * as bootstrap from 'bootstrap'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -430,7 +430,7 @@ const getVisiblePages = () => {
 
 const viewProfile = (doctor) => {
   selectedDoctor.value = doctor
-  const modal = new Modal(doctorModal.value)
+  const modal = new bootstrap.Modal(doctorModal.value)
   modal.show()
 }
 

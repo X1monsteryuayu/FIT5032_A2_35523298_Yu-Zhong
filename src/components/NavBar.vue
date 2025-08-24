@@ -42,6 +42,12 @@
             </router-link>
           </li>
           <li class="nav-item" role="none">
+            <router-link class="nav-link" to="/appointment-booking" role="menuitem">
+              <i class="fas fa-calendar-plus me-1" aria-hidden="true"></i>
+              Book Appointment
+            </router-link>
+          </li>
+          <li class="nav-item" role="none">
             <router-link class="nav-link" to="/email-demo" role="menuitem">
               <i class="fas fa-envelope me-1" aria-hidden="true"></i>
               Email Demo

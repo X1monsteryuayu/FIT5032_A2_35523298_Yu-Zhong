@@ -4,105 +4,108 @@
       <div class="row">
         <div class="col-12">
           <div class="card shadow">
-            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-              <h4 class="mb-0">预约记录</h4>
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+              <h4 class="mb-0">
+                <i class="fas fa-history me-2"></i>
+                Appointment History
+              </h4>
               <div class="d-flex gap-2">
                 <button class="btn btn-light btn-sm" @click="generateMockAppointments">
-                  <i class="bi bi-arrow-clockwise me-1"></i>
-                  刷新数据
+                  <i class="fas fa-sync-alt me-1"></i>
+                  Refresh Data
                 </button>
-                <router-link to="/consultation" class="btn btn-warning btn-sm">
-                  <i class="bi bi-plus-circle me-1"></i>
-                  新增预约
+                <router-link to="/appointment-booking" class="btn btn-warning btn-sm">
+                  <i class="fas fa-plus-circle me-1"></i>
+                  New Appointment
                 </router-link>
               </div>
             </div>
             <div class="card-body">
-              <!-- 搜索和过滤器 -->
+              <!-- Search and Filters -->
               <div class="row mb-3">
                 <div class="col-md-4">
                   <div class="input-group">
                     <span class="input-group-text">
-                      <i class="bi bi-search"></i>
+                      <i class="fas fa-search"></i>
                     </span>
                     <input
                       v-model="searchQuery"
                       type="text"
                       class="form-control"
-                      placeholder="搜索医生姓名或预约ID..."
+                      placeholder="Search doctor name or appointment ID..."
                       @input="handleSearch"
                     />
                   </div>
                 </div>
                 <div class="col-md-3">
                   <select v-model="statusFilter" class="form-select" @change="handleSearch">
-                    <option value="">所有状态</option>
-                    <option value="已预约">已预约</option>
-                    <option value="已完成">已完成</option>
-                    <option value="已取消">已取消</option>
-                    <option value="待确认">待确认</option>
+                    <option value="">All Status</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                    <option value="Pending">Pending</option>
                   </select>
                 </div>
                 <div class="col-md-3">
                   <select v-model="typeFilter" class="form-select" @change="handleSearch">
-                    <option value="">所有类型</option>
-                    <option value="门诊">门诊</option>
-                    <option value="复查">复查</option>
-                    <option value="手术咨询">手术咨询</option>
-                    <option value="健康检查">健康检查</option>
+                    <option value="">All Types</option>
+                    <option value="General Consultation">General Consultation</option>
+                    <option value="Follow-up">Follow-up</option>
+                    <option value="Surgery Consultation">Surgery Consultation</option>
+                    <option value="Health Checkup">Health Checkup</option>
                   </select>
                 </div>
                 <div class="col-md-2">
                   <select v-model="sortBy" class="form-select" @change="handleSort">
-                    <option value="date">按日期</option>
-                    <option value="doctorName">按医生</option>
-                    <option value="status">按状态</option>
+                    <option value="date">By Date</option>
+                    <option value="doctorName">By Doctor</option>
+                    <option value="status">By Status</option>
                   </select>
                 </div>
               </div>
 
-              <!-- 数据表格 -->
+              <!-- Data Table -->
               <div class="table-responsive">
                 <table class="table table-hover">
                   <thead class="table-dark">
                     <tr>
                       <th>
                         <button class="btn btn-link text-white p-0" @click="sort('id')">
-                          预约ID
+                          Appointment ID
                           <i :class="getSortIcon('id')"></i>
                         </button>
                       </th>
                       <th>
                         <button class="btn btn-link text-white p-0" @click="sort('doctorName')">
-                          医生
+                          Doctor
                           <i :class="getSortIcon('doctorName')"></i>
                         </button>
                       </th>
                       <th>
                         <button class="btn btn-link text-white p-0" @click="sort('date')">
-                          预约日期
+                          Appointment Date
                           <i :class="getSortIcon('date')"></i>
                         </button>
                       </th>
                       <th>
                         <button class="btn btn-link text-white p-0" @click="sort('time')">
-                          时间
+                          Time
                           <i :class="getSortIcon('time')"></i>
                         </button>
                       </th>
                       <th>
                         <button class="btn btn-link text-white p-0" @click="sort('type')">
-                          类型
+                          Type
                           <i :class="getSortIcon('type')"></i>
                         </button>
                       </th>
                       <th>
                         <button class="btn btn-link text-white p-0" @click="sort('status')">
-                          状态
+                          Status
                           <i :class="getSortIcon('status')"></i>
                         </button>
                       </th>
-                      <th>操作</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -115,7 +118,7 @@
                     </tr>
                     <tr v-else-if="paginatedData.length === 0">
                       <td colspan="7" class="text-center py-4 text-muted">
-                        没有找到匹配的预约记录
+                        No matching appointment records found
                       </td>
                     </tr>
                     <tr v-else v-for="appointment in paginatedData" :key="appointment.id">
@@ -124,16 +127,16 @@
                       </td>
                       <td>
                         <div class="d-flex align-items-center">
-                          <i class="bi bi-person-circle fs-5 text-primary me-2"></i>
+                          <i class="fas fa-user-md fs-5 text-primary me-2"></i>
                           <strong>{{ appointment.doctorName }}</strong>
                         </div>
                       </td>
                       <td>
-                        <i class="bi bi-calendar3 text-muted me-1"></i>
+                        <i class="fas fa-calendar-alt text-muted me-1"></i>
                         {{ formatDate(appointment.date) }}
                       </td>
                       <td>
-                        <i class="bi bi-clock text-muted me-1"></i>
+                        <i class="fas fa-clock text-muted me-1"></i>
                         {{ appointment.time }}
                       </td>
                       <td>
@@ -150,27 +153,31 @@
                       <td>
                         <div class="btn-group btn-group-sm">
                           <button class="btn btn-outline-primary" @click="viewDetails(appointment)">
-                            详情
+                            <i class="fas fa-eye me-1"></i>
+                            Details
                           </button>
                           <button 
-                            v-if="appointment.status === '已预约'"
+                            v-if="appointment.status === 'Confirmed'"
                             class="btn btn-outline-warning" 
                             @click="rescheduleAppointment(appointment)"
                           >
-                            改期
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Reschedule
                           </button>
                           <button 
-                            v-if="appointment.status === '已预约' || appointment.status === '待确认'"
+                            v-if="appointment.status === 'Confirmed' || appointment.status === 'Pending'"
                             class="btn btn-outline-danger" 
                             @click="cancelAppointment(appointment)"
                           >
-                            取消
+                            <i class="fas fa-times me-1"></i>
+                            Cancel
                           </button>
                           <button 
                             class="btn btn-outline-success" 
                             @click="downloadConfirmation(appointment)"
                           >
-                            下载
+                            <i class="fas fa-download me-1"></i>
+                            Download
                           </button>
                         </div>
                       </td>
@@ -179,12 +186,12 @@
                 </table>
               </div>
 
-              <!-- 分页 -->
-              <nav aria-label="预约记录分页" v-if="totalPages > 1">
+              <!-- Pagination -->
+              <nav aria-label="Appointment records pagination" v-if="totalPages > 1">
                 <ul class="pagination justify-content-center">
                   <li class="page-item" :class="{ disabled: currentPage === 1 }">
                     <button class="page-link" @click="changePage(currentPage - 1)">
-                      <i class="bi bi-chevron-left"></i>
+                      <i class="fas fa-chevron-left"></i>
                     </button>
                   </li>
                   
@@ -201,24 +208,23 @@
                   
                   <li class="page-item" :class="{ disabled: currentPage === totalPages }">
                     <button class="page-link" @click="changePage(currentPage + 1)">
-                      <i class="bi bi-chevron-right"></i>
+                      <i class="fas fa-chevron-right"></i>
                     </button>
                   </li>
                 </ul>
               </nav>
 
-              <!-- 分页信息 -->
+              <!-- Pagination Information -->
               <div class="d-flex justify-content-between align-items-center mt-3">
                 <div class="text-muted">
-                  显示 {{ startIndex + 1 }}-{{ Math.min(endIndex, filteredData.length) }} 条，
-                  共 {{ filteredData.length }} 条记录
+                  Showing {{ startIndex + 1 }}-{{ Math.min(endIndex, filteredData.length) }} of {{ filteredData.length }} records
                 </div>
                 <div>
                   <select v-model="itemsPerPage" class="form-select form-select-sm" @change="handlePageSizeChange">
-                    <option value="5">每页 5 条</option>
-                    <option value="10">每页 10 条</option>
-                    <option value="20">每页 20 条</option>
-                    <option value="50">每页 50 条</option>
+                    <option value="5">5 per page</option>
+                    <option value="10">10 per page</option>
+                    <option value="20">20 per page</option>
+                    <option value="50">50 per page</option>
                   </select>
                 </div>
               </div>
@@ -228,43 +234,46 @@
       </div>
     </div>
 
-    <!-- 预约详情模态框 -->
+    <!-- Appointment Details Modal -->
     <div class="modal fade" id="appointmentModal" tabindex="-1" ref="appointmentModal">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">预约详情</h5>
+            <h5 class="modal-title">
+              <i class="fas fa-info-circle me-2"></i>
+              Appointment Details
+            </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body" v-if="selectedAppointment">
             <div class="row">
               <div class="col-md-6">
-                <h6 class="text-primary">基本信息</h6>
+                <h6 class="text-primary">Basic Information</h6>
                 <table class="table table-sm">
                   <tr>
-                    <td><strong>预约ID:</strong></td>
+                    <td><strong>Appointment ID:</strong></td>
                     <td>#{{ selectedAppointment.id }}</td>
                   </tr>
                   <tr>
-                    <td><strong>医生:</strong></td>
+                    <td><strong>Doctor:</strong></td>
                     <td>{{ selectedAppointment.doctorName }}</td>
                   </tr>
                   <tr>
-                    <td><strong>日期:</strong></td>
+                    <td><strong>Date:</strong></td>
                     <td>{{ formatDate(selectedAppointment.date) }}</td>
                   </tr>
                   <tr>
-                    <td><strong>时间:</strong></td>
+                    <td><strong>Time:</strong></td>
                     <td>{{ selectedAppointment.time }}</td>
                   </tr>
                   <tr>
-                    <td><strong>类型:</strong></td>
+                    <td><strong>Type:</strong></td>
                     <td>
                       <span class="badge bg-info">{{ selectedAppointment.type }}</span>
                     </td>
                   </tr>
                   <tr>
-                    <td><strong>状态:</strong></td>
+                    <td><strong>Status:</strong></td>
                     <td>
                       <span 
                         class="badge"
@@ -277,21 +286,22 @@
                 </table>
               </div>
               <div class="col-md-6">
-                <h6 class="text-primary">附加信息</h6>
-                <p><strong>预约时间:</strong><br>{{ selectedAppointment.createdAt }}</p>
-                <p><strong>备注:</strong><br>{{ selectedAppointment.notes || '无' }}</p>
-                <p><strong>费用:</strong><br>¥{{ selectedAppointment.fee || '待确认' }}</p>
+                <h6 class="text-primary">Additional Information</h6>
+                <p><strong>Booking Time:</strong><br>{{ selectedAppointment.createdAt }}</p>
+                <p><strong>Notes:</strong><br>{{ selectedAppointment.notes || 'None' }}</p>
+                <p><strong>Fee:</strong><br>${{ selectedAppointment.fee || 'To be confirmed' }}</p>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <button 
               type="button" 
               class="btn btn-success"
               @click="downloadConfirmation(selectedAppointment)"
             >
-              下载确认单
+              <i class="fas fa-download me-2"></i>
+              Download Confirmation
             </button>
           </div>
         </div>
@@ -304,7 +314,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/store'
-import { Modal } from 'bootstrap'
+import * as bootstrap from 'bootstrap'
 import { downloadAppointmentPDF } from '@/services/emailService'
 
 const router = useRouter()
@@ -341,7 +351,7 @@ const filteredData = computed(() => {
     data = data.filter(appointment => appointment.status === statusFilter.value)
   }
 
-  // 类型过滤
+  // Type filter
   if (typeFilter.value) {
     data = data.filter(appointment => appointment.type === typeFilter.value)
   }
@@ -349,7 +359,7 @@ const filteredData = computed(() => {
   return data
 })
 
-// 排序数据
+// Sorted data
 const sortedData = computed(() => {
   const data = [...filteredData.value]
   
@@ -373,7 +383,7 @@ const sortedData = computed(() => {
   })
 })
 
-// 分页计算
+// Pagination calculation
 const totalPages = computed(() => Math.ceil(sortedData.value.length / itemsPerPage.value))
 const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value)
 const endIndex = computed(() => startIndex.value + itemsPerPage.value)
@@ -382,19 +392,19 @@ const paginatedData = computed(() => {
   return sortedData.value.slice(startIndex.value, endIndex.value)
 })
 
-// 方法
+// Methods
 const generateMockAppointments = () => {
   loading.value = true
   
   setTimeout(() => {
-    const doctors = ['张医生', '李医生', '王医生', '刘医生', '陈医生', '杨医生', '赵医生', '孙医生']
-    const statuses = ['已预约', '已完成', '已取消', '待确认']
-    const types = ['门诊', '复查', '手术咨询', '健康检查']
+    const doctors = ['Dr. Johnson', 'Dr. Smith', 'Dr. Wilson', 'Dr. Brown', 'Dr. Chen', 'Dr. Davis', 'Dr. Miller', 'Dr. Garcia']
+    const statuses = ['Confirmed', 'Completed', 'Cancelled', 'Pending']
+    const types = ['General Consultation', 'Follow-up', 'Surgery Consultation', 'Health Checkup']
     const times = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00']
     
     rawData.value = Array.from({ length: 85 }, (_, i) => {
       const date = new Date()
-      date.setDate(date.getDate() + Math.floor(Math.random() * 60) - 30) // 前后30天
+      date.setDate(date.getDate() + Math.floor(Math.random() * 60) - 30) // ±30 days
       
       return {
         id: 1000 + i,
@@ -404,7 +414,7 @@ const generateMockAppointments = () => {
         type: types[Math.floor(Math.random() * types.length)],
         status: statuses[Math.floor(Math.random() * statuses.length)],
         createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleString(),
-        notes: Math.random() > 0.7 ? '请提前15分钟到达' : null,
+        notes: Math.random() > 0.7 ? 'Please arrive 15 minutes early' : null,
         fee: Math.floor(Math.random() * 500) + 100
       }
     })
@@ -477,7 +487,7 @@ const getVisiblePages = () => {
 }
 
 const formatDate = (dateStr) => {
-  return new Date(dateStr).toLocaleDateString('zh-CN', {
+  return new Date(dateStr).toLocaleDateString('en-US', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
@@ -486,35 +496,35 @@ const formatDate = (dateStr) => {
 
 const getStatusBadgeClass = (status) => {
   switch (status) {
-    case '已预约': return 'bg-primary'
-    case '已完成': return 'bg-success'
-    case '已取消': return 'bg-danger'
-    case '待确认': return 'bg-warning'
+    case 'Confirmed': return 'bg-primary'
+    case 'Completed': return 'bg-success'
+    case 'Cancelled': return 'bg-danger'
+    case 'Pending': return 'bg-warning'
     default: return 'bg-secondary'
   }
 }
 
 const viewDetails = (appointment) => {
   selectedAppointment.value = appointment
-  const modal = new Modal(appointmentModal.value)
+  const modal = new bootstrap.Modal(appointmentModal.value)
   modal.show()
 }
 
 const rescheduleAppointment = (appointment) => {
-  if (confirm('确定要改期此预约吗？')) {
-    // 实现改期逻辑
+  if (confirm('Are you sure you want to reschedule this appointment?')) {
+    // Implement reschedule logic
     router.push({
-      name: 'Consultation',
+      name: 'AppointmentBooking',
       query: { reschedule: appointment.id }
     })
   }
 }
 
 const cancelAppointment = (appointment) => {
-  if (confirm('确定要取消此预约吗？此操作不可撤销。')) {
-    // 更新状态
-    appointment.status = '已取消'
-    alert('预约已取消')
+  if (confirm('Are you sure you want to cancel this appointment? This action cannot be undone.')) {
+    // Update status
+    appointment.status = 'Cancelled'
+    alert('Appointment has been cancelled')
   }
 }
 
