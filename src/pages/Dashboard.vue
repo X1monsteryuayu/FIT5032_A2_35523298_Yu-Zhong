@@ -43,6 +43,22 @@
           </router-link>
         </div>
 
+        <!-- Health Map -->
+        <div class="col-md-6 col-lg-3">
+          <router-link to="/health-map" class="text-decoration-none">
+            <div class="card h-100 feature-card">
+              <div class="card-body text-center">
+                <i class="bi bi-geo-alt fs-1 mb-3"></i>
+                <h3 class="card-title">Health Facilities Map</h3>
+                <p class="card-text">Find nearby medical facilities with navigation</p>
+              </div>
+            </div>
+          </router-link>
+        </div>
+      </div>
+
+      <!-- Second row -->
+      <div class="row g-4 mt-4">
         <!-- Home -->
         <div class="col-md-6 col-lg-3">
           <router-link to="/home" class="text-decoration-none">

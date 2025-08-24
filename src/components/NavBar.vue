@@ -24,6 +24,11 @@
             </router-link>
           </li>
           <li class="nav-item">
+            <router-link class="nav-link" to="/health-map">
+              <i class="fas fa-map-marked-alt me-1"></i>Health Map
+            </router-link>
+          </li>
+          <li class="nav-item">
             <router-link class="nav-link" to="/email-demo">
               <i class="fas fa-envelope me-1"></i>Email Demo
             </router-link>

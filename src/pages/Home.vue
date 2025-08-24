@@ -60,6 +60,49 @@
             </div>
           </div>
         </div>
+        
+        <!-- Second row of services -->
+        <div class="row g-4 mt-4">
+          <div class="col-12 col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="bi bi-geo-alt"></i>
+              </div>
+              <h3>Health Facilities Map</h3>
+              <p>Find nearby hospitals, clinics, and pharmacies with navigation</p>
+              <div class="mt-3">
+                <router-link to="/health-map" class="btn btn-outline-primary">Explore Map</router-link>
+                <small class="d-block mt-2 text-muted">Location services included</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="bi bi-envelope"></i>
+              </div>
+              <h3>Contact Support</h3>
+              <p>Send us your questions or feedback with file attachments</p>
+              <div class="mt-3">
+                <router-link to="/email-demo" class="btn btn-outline-primary">Contact Us</router-link>
+                <small class="d-block mt-2 text-muted">Quick response guaranteed</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <h3>Safe & Secure</h3>
+              <p>Your health information is protected with advanced security</p>
+              <div class="mt-3">
+                <router-link to="/register" class="btn btn-outline-primary">Join Safely</router-link>
+                <small class="d-block mt-2 text-muted">GDPR compliant</small>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 

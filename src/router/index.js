@@ -5,6 +5,7 @@ import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
 import Dashboard from '../pages/Dashboard.vue';
 import HealthArticles from '../pages/HealthArticles.vue';
+import HealthMap from '../pages/HealthMap.vue';
 import DoctorRating from '../pages/DoctorRating.vue';
 import AdminPanel from '../pages/AdminPanel.vue';
 
@@ -18,6 +19,12 @@ const routes = [
     path: '/health-articles', 
     name: 'HealthArticles', 
     component: HealthArticles,
+    meta: { requiresAuth: false }
+  },
+  { 
+    path: '/health-map', 
+    name: 'HealthMap', 
+    component: HealthMap,
     meta: { requiresAuth: false }
   },
   { 
