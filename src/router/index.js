@@ -8,6 +8,7 @@ import HealthArticles from '../pages/HealthArticles.vue';
 import HealthMap from '../pages/HealthMap.vue';
 import DoctorRating from '../pages/DoctorRating.vue';
 import AdminPanel from '../pages/AdminPanel.vue';
+import AccessibilityDemo from '../pages/AccessibilityDemo.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -25,6 +26,12 @@ const routes = [
     path: '/health-map', 
     name: 'HealthMap', 
     component: HealthMap,
+    meta: { requiresAuth: false }
+  },
+  { 
+    path: '/accessibility-demo', 
+    name: 'AccessibilityDemo', 
+    component: AccessibilityDemo,
     meta: { requiresAuth: false }
   },
   { 

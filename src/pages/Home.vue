@@ -378,7 +378,7 @@ export default {
   border-radius: 50px;
 }
 
-/* 全局居中样式 */
+/* Global centering styles */
 body {
   display: flex;
   flex-direction: column;

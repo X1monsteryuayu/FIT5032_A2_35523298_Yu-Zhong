@@ -1,7 +1,7 @@
 <template>
   <div class="login-page" role="main">
     <div class="login-container">
-      <h1 class="text-center mb-4 visually-accessible-heading">欢迎回来</h1>
+      <h1 class="text-center mb-4 visually-accessible-heading">Welcome Back</h1>
       <form @submit.prevent="handleLogin" class="login-form" role="form" aria-labelledby="login-heading">
         <div v-if="authStore.error" class="alert alert-danger" role="alert" aria-live="polite">
           <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
@@ -10,15 +10,15 @@
         <div class="form-group mb-3">
           <label for="email" class="form-label required-field">
             <i class="fas fa-envelope" aria-hidden="true"></i>
-            邮箱地址
-            <span class="required-asterisk" aria-label="必填项">*</span>
+            Email Address
+            <span class="required-asterisk" aria-label="Required field">*</span>
           </label>
           <input 
             id="email"
             v-model="email" 
             type="email" 
             class="form-control" 
-            placeholder="请输入您的邮箱地址"
+            placeholder="Enter your email address"
             required 
             :disabled="authStore.loading"
             aria-describedby="email-help"
@@ -26,21 +26,21 @@
             autocomplete="email"
           />
           <small id="email-help" class="form-text text-muted">
-            用于登录的邮箱地址
+            The email address used for login
           </small>
         </div>
         <div class="form-group mb-4">
           <label for="password" class="form-label required-field">
             <i class="fas fa-lock" aria-hidden="true"></i>
-            密码
-            <span class="required-asterisk" aria-label="必填项">*</span>
+            Password
+            <span class="required-asterisk" aria-label="Required field">*</span>
           </label>
           <input 
             id="password"
             v-model="password" 
             type="password" 
             class="form-control"
-            placeholder="请输入您的密码" 
+            placeholder="Enter your password" 
             required 
             :disabled="authStore.loading"
             aria-describedby="password-help"
@@ -48,7 +48,7 @@
             autocomplete="current-password"
           />
           <small id="password-help" class="form-text text-muted">
-            至少8位字符的密码
+            Password with at least 8 characters
           </small>
         </div>
         <button 
@@ -59,14 +59,14 @@
           aria-describedby="login-status"
         >
           <span v-if="authStore.loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          {{ authStore.loading ? '正在登录...' : '登录' }}
+          {{ authStore.loading ? 'Logging in...' : 'Login' }}
         </button>
         <div id="login-status" class="visually-hidden" aria-live="polite">
-          {{ authStore.loading ? '正在处理登录请求，请稍候' : '' }}
+          {{ authStore.loading ? 'Processing login request, please wait' : '' }}
         </div>
         <p class="text-center">
-          还没有账户？
-          <router-link to="/register" aria-label="前往注册页面">立即注册</router-link>
+          Don't have an account?
+          <router-link to="/register" aria-label="Go to registration page">Register now</router-link>
         </p>
       </form>
     </div>
@@ -98,27 +98,27 @@ export default {
   methods: {
     async handleLogin() {
       if (!this.email || !this.password) {
-        alert('请输入邮箱和密码')
+        alert('Please enter email and password')
         return
       }
       
-      console.log('尝试Firebase登录:', this.email)
+      console.log('Attempting Firebase login:', this.email)
       
       try {
-        // 使用Firebase认证
+        // Use Firebase authentication
         const user = await this.authStore.login(this.email, this.password)
-        console.log('Firebase登录成功，用户:', user)
+        console.log('Firebase login successful, user:', user)
 
-        // 登录成功后立即重定向，不等待任何异步操作
+        // Redirect immediately after successful login, don't wait for any async operations
         const redirectPath = this.$route.query.redirect || '/dashboard'
-        console.log('准备重定向到:', redirectPath)
+        console.log('Preparing to redirect to:', redirectPath)
 
-        // 使用 Vue Router 进行导航
+        // Use Vue Router for navigation
         await this.$router.push(redirectPath)
-        console.log('重定向完成')
+        console.log('Redirect completed')
       } catch (error) {
-        console.error('登录失败:', error)
-        alert('登录失败，请检查您的邮箱和密码')
+        console.error('Login failed:', error)
+        alert('Login failed, please check your email and password')
       }
     }
   }

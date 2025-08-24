@@ -13,10 +13,10 @@
           </div>
           <div class="col-auto">
             <div class="btn-group">
-              <button @click="getCurrentLocation" class="btn btn-primary btn-lg shadow-sm" title="获取当前位置">
+              <button @click="getCurrentLocation" class="btn btn-primary btn-lg shadow-sm" title="Get Current Location">
                 <i class="fas fa-location-arrow me-2"></i>Use My Location
               </button>
-              <button @click="searchNearbyFacilities" class="btn btn-success btn-lg shadow-sm" title="搜索附近设施" :disabled="loading">
+              <button @click="searchNearbyFacilities" class="btn btn-success btn-lg shadow-sm" title="Search Nearby Facilities" :disabled="loading">
                 <i class="fas fa-search me-2" v-if="!loading"></i>
                 <span class="spinner-border spinner-border-sm me-2" v-else role="status"></span>
                 Quick Search
@@ -35,7 +35,7 @@
           @click="toggleSidebar" 
           class="mobile-sidebar-toggle btn btn-primary position-fixed"
           :class="{ 'active': sidebarOpen }"
-          aria-label="切换侧边栏菜单"
+          aria-label="Toggle Sidebar Menu"
           :aria-expanded="sidebarOpen"
           aria-controls="sidebar-content"
         >
@@ -44,8 +44,8 @@
         </button>
         
         <!-- Enhanced Sidebar -->
-        <div class="col-lg-4 col-md-5 sidebar" :class="{ 'open': sidebarOpen }" role="complementary" aria-label="搜索和结果面板" id="sidebar-content">
-          <!-- 移动端遮罩层 -->
+        <div class="col-lg-4 col-md-5 sidebar" :class="{ 'open': sidebarOpen }" role="complementary" aria-label="Search and Results Panel" id="sidebar-content">
+          <!-- Mobile Overlay -->
           <div v-if="isMobile && sidebarOpen" class="sidebar-overlay" @click="toggleSidebar" aria-hidden="true"></div>
           
           <div class="sidebar-content p-4">
@@ -54,12 +54,12 @@
             <div class="search-card mb-4" role="search" aria-labelledby="search-heading">
               <div class="card-header">
                 <h2 id="search-heading" class="mb-0 fw-bold">
-                  <i class="fas fa-search me-2" aria-hidden="true"></i>搜索医疗设施
+                  <i class="fas fa-search me-2" aria-hidden="true"></i>Search Medical Facilities
                 </h2>
               </div>
               <div class="card-body p-4">
                 <div class="mb-4">
-                  <label for="location-input" class="form-label fw-semibold mb-2">位置</label>
+                  <label for="location-input" class="form-label fw-semibold mb-2">Location</label>
                   <div class="input-group input-group-lg">
                     <span class="input-group-text bg-light border-end-0" aria-hidden="true">
                       <i class="fas fa-map-marker-alt text-primary"></i>
@@ -69,33 +69,33 @@
                       v-model="searchQuery" 
                       type="text" 
                       class="form-control border-start-0 ps-2" 
-                      placeholder="输入地址或地标"
+                      placeholder="Enter address or landmark"
                       @keyup.enter="searchLocation"
                       aria-describedby="location-help"
                     >
                   </div>
                   <small id="location-help" class="form-text text-muted">
-                    输入您要搜索的地址、城市或地标名称
+                    Enter the address, city, or landmark name you want to search
                   </small>
                 </div>
                 
                 <div class="mb-4">
-                  <label for="facility-type" class="form-label fw-semibold mb-2">设施类型</label>
+                  <label for="facility-type" class="form-label fw-semibold mb-2">Facility Type</label>
                   <select id="facility-type" v-model="facilityType" class="form-select form-select-lg" aria-describedby="facility-help">
-                    <option value="">所有设施</option>
-                    <option value="hospital">🏥 医院</option>
-                    <option value="clinic">🩺 诊所</option>
-                    <option value="pharmacy">💊 药店</option>
-                    <option value="emergency">🚑 急救服务</option>
+                    <option value="">All Facilities</option>
+                    <option value="hospital">🏥 Hospital</option>
+                    <option value="clinic">🩺 Clinic</option>
+                    <option value="pharmacy">💊 Pharmacy</option>
+                    <option value="emergency">🚑 Emergency Service</option>
                   </select>
                   <small id="facility-help" class="form-text text-muted">
-                    选择您要查找的医疗设施类型
+                    Select the type of medical facility you want to find
                   </small>
                 </div>
                 
                 <div class="mb-4">
                   <label for="search-radius" class="form-label fw-semibold mb-3">
-                    搜索半径: <span class="text-primary fw-bold fs-5">{{ searchRadius }}公里</span>
+                    Search Radius: <span class="text-primary fw-bold fs-5">{{ searchRadius }}km</span>
                   </label>
                   <input 
                     id="search-radius"
@@ -108,11 +108,11 @@
                     aria-describedby="radius-help"
                   >
                   <div class="d-flex justify-content-between small text-muted mt-2">
-                    <span>1公里</span>
-                    <span>50公里</span>
+                    <span>1km</span>
+                    <span>50km</span>
                   </div>
                   <small id="radius-help" class="form-text text-muted">
-                    调整搜索范围，数值越大搜索范围越广
+                    Adjust search range, higher values expand search area
                   </small>
                 </div>
                 
@@ -123,7 +123,7 @@
                   :aria-busy="loading"
                   aria-describedby="search-status"
                 >
-                  <i class="fas fa-search me-2" aria-hidden="true"></i>搜索真实设施
+                  <i class="fas fa-search me-2" aria-hidden="true"></i>Search Real Facilities
                 </button>
                 
                 <button 
@@ -133,14 +133,14 @@
                   :aria-busy="loading"
                 >
                   <i class="fas fa-map-marked-alt me-2" aria-hidden="true"></i>
-                  <span v-if="!loading">查找附近设施</span>
+                  <span v-if="!loading">Find Nearby Facilities</span>
                   <span v-else>
                     <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    搜索中...
+                    Searching...
                   </span>
                 </button>
                 <div id="search-status" class="visually-hidden" aria-live="polite">
-                  {{ loading ? '正在搜索医疗设施，请稍候' : '' }}
+                  {{ loading ? 'Searching medical facilities, please wait' : '' }}
                 </div>
                 
                 <div class="mt-3 p-3 bg-info bg-opacity-10 rounded">
@@ -344,7 +344,17 @@
         <!-- Enhanced Map Container -->
         <div class="col-lg-8 col-md-7 map-container">
           <div class="map-wrapper p-4">
-            <div id="map" class="enhanced-map" style="height: 600px; width: 100%;"></div>
+            <div id="map" 
+                 class="enhanced-map" 
+                 style="height: 600px; width: 100%;"
+                 role="application"
+                 aria-label="Interactive map showing medical facilities"
+                 aria-describedby="map-description"></div>
+            
+            <!-- Hidden description for screen readers -->
+            <div id="map-description" class="visually-hidden">
+              Interactive map displaying medical facilities in your area. Use the search controls in the sidebar to find specific types of facilities. Selected facilities will appear in the results list with detailed information including address, distance, and contact details.
+            </div>
             
             <!-- Map Controls -->
             <div class="map-controls">
@@ -592,6 +602,20 @@ export default {
       // Wait for DOM to be ready
       this.$nextTick(() => {
         try {
+          // Check if map container exists
+          const mapContainer = document.getElementById('map')
+          if (!mapContainer) {
+            console.error('Map container not found')
+            this.loading = false
+            return
+          }
+
+          // Clean up existing map if any
+          if (this.map) {
+            this.map.remove()
+            this.map = null
+          }
+          
           // Initialize Leaflet map centered on Melbourne
           this.map = L.map('map').setView([-37.8136, 144.9631], 13)
           
@@ -610,11 +634,14 @@ export default {
             }
           })
           
-          // Add all facility markers to the map
-          this.addFacilityMarkers()
+          // Wait for map to be fully loaded before adding markers
+          this.map.whenReady(() => {
+            console.log('Map fully loaded, adding markers...')
+            this.addFacilityMarkers()
+            this.loading = false
+            this.loadingMessage = ''
+          })
           
-          this.loading = false
-          this.loadingMessage = ''
         } catch (error) {
           console.error('Error initializing map:', error)
           this.loading = false
@@ -625,38 +652,48 @@ export default {
 
     // Add facility markers to the map
     addFacilityMarkers() {
+      // Check if map is initialized
+      if (!this.map) {
+        console.warn('Map not initialized yet, skipping marker addition')
+        return
+      }
+      
       // Clear existing markers
       this.clearMarkers()
       
       this.allFacilities.forEach(facility => {
-        // Create custom icon based on facility type
-        const icon = this.createCustomIcon(facility.type)
-        
-        // Create marker
-        const marker = L.marker([facility.lat, facility.lng], { icon })
-          .addTo(this.map)
-          .bindPopup(`
-            <div class="facility-popup">
-              <h6><i class="${this.getFacilityIcon(facility.type)}"></i> ${facility.name}</h6>
-              <p class="mb-1">${facility.address}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="badge" style="background-color: ${this.getFacilityColor(facility.type)}">${facility.type}</span>
-                <span class="text-muted small">★ ${facility.rating}/5</span>
+        try {
+          // Create custom icon based on facility type
+          const icon = this.createCustomIcon(facility.type)
+          
+          // Create marker
+          const marker = L.marker([facility.lat, facility.lng], { icon })
+            .addTo(this.map)
+            .bindPopup(`
+              <div class="facility-popup">
+                <h6><i class="${this.getFacilityIcon(facility.type)}"></i> ${facility.name}</h6>
+                <p class="mb-1">${facility.address}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="badge" style="background-color: ${this.getFacilityColor(facility.type)}">${facility.type}</span>
+                  <span class="text-muted small">★ ${facility.rating}/5</span>
+                </div>
+                <p class="mb-1"><i class="fas fa-clock"></i> ${facility.hours}</p>
+                <button class="btn btn-primary btn-sm mt-2" onclick="window.selectFacilityFromMap(${facility.id})">
+                  Select Facility
+                </button>
               </div>
-              <p class="mb-1"><i class="fas fa-clock"></i> ${facility.hours}</p>
-              <button class="btn btn-primary btn-sm mt-2" onclick="window.selectFacilityFromMap(${facility.id})">
-                Select Facility
-              </button>
-            </div>
-          `)
-        
-        // Store marker reference
-        this.markers.push(marker)
-        
-        // Add click event
-        marker.on('click', () => {
-          this.selectFacility(facility)
-        })
+            `)
+          
+          // Store marker reference
+          this.markers.push(marker)
+          
+          // Add click event
+          marker.on('click', () => {
+            this.selectFacility(facility)
+          })
+        } catch (error) {
+          console.error('Error adding marker for facility:', facility.name, error)
+        }
       })
     },
 
@@ -725,11 +762,24 @@ export default {
               }
               
               this.userMarker = L.marker([this.userLocation.lat, this.userLocation.lng], { icon: userIcon })
-                .addTo(this.map)
-                .bindPopup('Your Current Location')
               
-              // 将地图中心设置为用户位置
-              this.map.setView([this.userLocation.lat, this.userLocation.lng], 15)
+              // Check if map is ready before adding marker
+              if (this.map._loaded) {
+                this.userMarker.addTo(this.map)
+                  .bindPopup('Your Current Location')
+                
+                // 将地图中心设置为用户位置
+                this.map.setView([this.userLocation.lat, this.userLocation.lng], 15)
+              } else {
+                // Wait for map to be ready
+                this.map.whenReady(() => {
+                  this.userMarker.addTo(this.map)
+                    .bindPopup('Your Current Location')
+                  
+                  // 将地图中心设置为用户位置
+                  this.map.setView([this.userLocation.lat, this.userLocation.lng], 15)
+                })
+              }
             }
             
             this.loading = false
@@ -950,7 +1000,7 @@ export default {
           }
           
           // 更新地图视图到搜索结果
-          if (this.map) {
+          if (this.map && this.map._loaded) {
             this.map.setView([this.userLocation.lat, this.userLocation.lng], 14)
             
             // 添加搜索结果标记
@@ -965,6 +1015,23 @@ export default {
               .addTo(this.map)
               .bindPopup(`<b>Search Result:</b><br>${result.display_name}`)
               .openPopup()
+          } else if (this.map) {
+            // Wait for map to be ready
+            this.map.whenReady(() => {
+              this.map.setView([this.userLocation.lat, this.userLocation.lng], 14)
+              
+              const searchIcon = L.divIcon({
+                className: 'search-result-marker',
+                html: '<div class="search-pin"><i class="fas fa-search"></i></div>',
+                iconSize: [25, 25],
+                iconAnchor: [12, 25]
+              })
+              
+              L.marker([this.userLocation.lat, this.userLocation.lng], { icon: searchIcon })
+                .addTo(this.map)
+                .bindPopup(`<b>Search Result:</b><br>${result.display_name}`)
+                .openPopup()
+            })
           }
           
           // 搜索附近的真实医疗设施
@@ -1134,46 +1201,95 @@ export default {
     
     // 添加真实设施标记到地图
     addRealFacilityMarkers() {
+      // Check if map is initialized
+      if (!this.map) {
+        console.warn('Map not initialized yet, skipping real facility markers')
+        return
+      }
+      
       // 清除现有标记
       this.clearMarkers()
       
       this.searchResults.forEach(facility => {
-        // 创建自定义图标
-        const icon = this.createCustomIcon(facility.type)
-        
-        // 创建标记
-        const marker = L.marker([facility.lat, facility.lng], { icon })
-          .addTo(this.map)
-          .bindPopup(`
-            <div class="facility-popup">
-              <h6><i class="${this.getFacilityIcon(facility.type)}"></i> ${facility.name}</h6>
-              <p class="mb-1">${facility.address}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="badge" style="background-color: ${this.getFacilityColor(facility.type)}">${facility.type}</span>
-                <span class="text-muted small">★ ${facility.rating}/5</span>
-              </div>
-              <p class="mb-1"><i class="fas fa-route"></i> ${facility.distance}km away</p>
-              <p class="mb-1"><i class="fas fa-clock"></i> ${facility.hours}</p>
-              ${facility.phone !== 'Phone not available' ? `<p class="mb-1"><i class="fas fa-phone"></i> ${facility.phone}</p>` : ''}
-              ${facility.website ? `<p class="mb-1"><a href="${facility.website}" target="_blank"><i class="fas fa-globe"></i> Website</a></p>` : ''}
-              <div class="mt-2">
-                <button class="btn btn-primary btn-sm me-2" onclick="window.selectFacilityFromMap(${facility.id})">
-                  Select
-                </button>
-                <button class="btn btn-success btn-sm" onclick="window.getDirectionsFromMap(${facility.id})">
-                  Directions
-                </button>
-              </div>
-            </div>
-          `)
-        
-        // 存储标记引用
-        this.markers.push(marker)
-        
-        // 添加点击事件
-        marker.on('click', () => {
-          this.selectFacility(facility)
-        })
+        try {
+          // 创建自定义图标
+          const icon = this.createCustomIcon(facility.type)
+          
+          // 创建标记
+          const marker = L.marker([facility.lat, facility.lng], { icon })
+          
+          // Check if map is ready before adding marker
+          if (this.map._loaded) {
+            marker.addTo(this.map)
+              .bindPopup(`
+                <div class="facility-popup">
+                  <h6><i class="${this.getFacilityIcon(facility.type)}"></i> ${facility.name}</h6>
+                  <p class="mb-1">${facility.address}</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge" style="background-color: ${this.getFacilityColor(facility.type)}">${facility.type}</span>
+                    <span class="text-muted small">★ ${facility.rating}/5</span>
+                  </div>
+                  <p class="mb-1"><i class="fas fa-route"></i> ${facility.distance}km away</p>
+                  <p class="mb-1"><i class="fas fa-clock"></i> ${facility.hours}</p>
+                  ${facility.phone !== 'Phone not available' ? `<p class="mb-1"><i class="fas fa-phone"></i> ${facility.phone}</p>` : ''}
+                  ${facility.website ? `<p class="mb-1"><a href="${facility.website}" target="_blank"><i class="fas fa-globe"></i> Website</a></p>` : ''}
+                  <div class="mt-2">
+                    <button class="btn btn-primary btn-sm me-2" onclick="window.selectFacilityFromMap(${facility.id})">
+                      Select
+                    </button>
+                    <button class="btn btn-success btn-sm" onclick="window.getDirectionsFromMap(${facility.id})">
+                      Directions
+                    </button>
+                  </div>
+                </div>
+              `)
+            
+            // 存储标记引用
+            this.markers.push(marker)
+            
+            // 添加点击事件
+            marker.on('click', () => {
+              this.selectFacility(facility)
+            })
+          } else {
+            // Wait for map to be ready
+            this.map.whenReady(() => {
+              marker.addTo(this.map)
+                .bindPopup(`
+                  <div class="facility-popup">
+                    <h6><i class="${this.getFacilityIcon(facility.type)}"></i> ${facility.name}</h6>
+                    <p class="mb-1">${facility.address}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="badge" style="background-color: ${this.getFacilityColor(facility.type)}">${facility.type}</span>
+                      <span class="text-muted small">★ ${facility.rating}/5</span>
+                    </div>
+                    <p class="mb-1"><i class="fas fa-route"></i> ${facility.distance}km away</p>
+                    <p class="mb-1"><i class="fas fa-clock"></i> ${facility.hours}</p>
+                    ${facility.phone !== 'Phone not available' ? `<p class="mb-1"><i class="fas fa-phone"></i> ${facility.phone}</p>` : ''}
+                    ${facility.website ? `<p class="mb-1"><a href="${facility.website}" target="_blank"><i class="fas fa-globe"></i> Website</a></p>` : ''}
+                    <div class="mt-2">
+                      <button class="btn btn-primary btn-sm me-2" onclick="window.selectFacilityFromMap(${facility.id})">
+                        Select
+                      </button>
+                      <button class="btn btn-success btn-sm" onclick="window.getDirectionsFromMap(${facility.id})">
+                        Directions
+                      </button>
+                    </div>
+                  </div>
+                `)
+              
+              // 存储标记引用
+              this.markers.push(marker)
+              
+              // 添加点击事件
+              marker.on('click', () => {
+                this.selectFacility(facility)
+              })
+            })
+          }
+        } catch (error) {
+          console.error('Error adding real facility marker:', facility.name, error)
+        }
       })
     },
     
@@ -1311,6 +1427,12 @@ export default {
     
     // 在地图上绘制路线
     drawRouteOnMap(geometry) {
+      // Check if map is initialized
+      if (!this.map) {
+        console.warn('Map not initialized yet, skipping route drawing')
+        return
+      }
+      
       // 移除之前的路线
       if (this.routeLayer) {
         this.map.removeLayer(this.routeLayer)
@@ -1324,11 +1446,25 @@ export default {
           opacity: 0.8,
           dashArray: '10, 5'
         }
-      }).addTo(this.map)
+      })
       
-      // 调整地图视图以包含整条路线
-      const bounds = this.routeLayer.getBounds()
-      this.map.fitBounds(bounds, { padding: [20, 20] })
+      // Check if map is ready before adding route
+      if (this.map._loaded) {
+        this.routeLayer.addTo(this.map)
+        
+        // 调整地图视图以包含整条路线
+        const bounds = this.routeLayer.getBounds()
+        this.map.fitBounds(bounds, { padding: [20, 20] })
+      } else {
+        // Wait for map to be ready
+        this.map.whenReady(() => {
+          this.routeLayer.addTo(this.map)
+          
+          // 调整地图视图以包含整条路线
+          const bounds = this.routeLayer.getBounds()
+          this.map.fitBounds(bounds, { padding: [20, 20] })
+        })
+      }
     },
     
     // Start navigation (opens in external app)

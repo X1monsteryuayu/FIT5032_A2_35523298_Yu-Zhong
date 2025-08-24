@@ -101,8 +101,8 @@
                   </select>
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
-                  <button class="btn btn-outline-secondary btn-sm" @click="clearArticleFilters">
-                    <i class="fas fa-times"></i>
+                  <button class="btn btn-outline-secondary btn-sm" @click="clearArticleFilters" aria-label="Clear all filters">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                   </button>
                 </div>
               </div>
@@ -248,8 +248,8 @@
                   </select>
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
-                  <button class="btn btn-outline-secondary btn-sm" @click="clearCommentFilters">
-                    <i class="fas fa-times"></i>
+                  <button class="btn btn-outline-secondary btn-sm" @click="clearCommentFilters" aria-label="Clear comment filters">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                   </button>
                 </div>
               </div>
@@ -271,7 +271,7 @@
                   <tr v-for="comment in paginatedComments" :key="comment.id">
                     <td>
                       <div class="d-flex align-items-center">
-                        <img :src="comment.avatar" class="rounded-circle me-2" width="32" height="32">
+                        <img :src="comment.avatar" :alt="`${comment.commenter}'s avatar`" class="rounded-circle me-2" width="32" height="32">
                         <div>
                           <div class="fw-bold">{{ comment.commenter }}</div>
                           <small class="text-muted">{{ comment.email }}</small>
@@ -290,11 +290,11 @@
                     </td>
                     <td>
                       <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-primary" @click="viewComment(comment)">
-                          <i class="fas fa-eye"></i>
+                        <button class="btn btn-outline-primary" @click="viewComment(comment)" :aria-label="`View comment by ${comment.commenter}`">
+                          <i class="fas fa-eye" aria-hidden="true"></i>
                         </button>
-                        <button class="btn btn-outline-danger" @click="deleteComment(comment.id)">
-                          <i class="fas fa-trash"></i>
+                        <button class="btn btn-outline-danger" @click="deleteComment(comment.id)" :aria-label="`Delete comment by ${comment.commenter}`">
+                          <i class="fas fa-trash" aria-hidden="true"></i>
                         </button>
                       </div>
                     </td>

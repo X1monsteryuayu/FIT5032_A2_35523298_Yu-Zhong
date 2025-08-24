@@ -271,7 +271,7 @@
                   <tr v-for="comment in paginatedComments" :key="comment.id">
                     <td>
                       <div class="d-flex align-items-center">
-                        <img :src="comment.avatar" class="rounded-circle me-2" width="32" height="32">
+                        <img :src="comment.avatar" :alt="`${comment.commenter}'s avatar`" class="rounded-circle me-2" width="32" height="32">
                         <div>
                           <div class="fw-bold">{{ comment.commenter }}</div>
                           <small class="text-muted">{{ comment.email }}</small>

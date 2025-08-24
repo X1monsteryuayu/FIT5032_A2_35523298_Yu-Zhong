@@ -1,32 +1,35 @@
 <template>
   <div class="app-container">
+    <!-- 跳过链接 - 无障碍导航 -->
+    <a href="#main-content" class="skip-link">跳到主要内容</a>
+    
     <!-- 使用NavBar组件 -->
     <NavBar />
 
     <!-- 主内容区域 -->
-    <main class="main-content container d-flex flex-column justify-content-center align-items-center text-center">
+    <main id="main-content" class="main-content container d-flex flex-column justify-content-center align-items-center text-center" role="main" tabindex="-1">
       <router-view></router-view>
     </main>
 
     <!-- 页脚 -->
-    <footer class="footer mt-auto py-4 bg-white shadow-top">
+    <footer class="footer mt-auto py-4 bg-white shadow-top" role="contentinfo">
       <div class="container">
         <div class="row">
           <div class="col-md-4 mb-3">
-            <h5>About Us</h5>
-            <p>Healthy Pathway - Your trusted healthcare companion</p>
+            <h5>关于我们</h5>
+            <p>Healthy Pathway - 您可信赖的健康伙伴</p>
           </div>
           <div class="col-md-4 mb-3">
-            <h5>Quick Links</h5>
+            <h5>快速链接</h5>
             <ul class="list-unstyled">
-              <li><router-link to="/">Home</router-link></li>
-              <li><router-link to="/login">Login</router-link></li>
-              <li><router-link to="/register">Register</router-link></li>
+              <li><router-link to="/" aria-label="回到首页">首页</router-link></li>
+              <li><router-link to="/login" aria-label="用户登录">登录</router-link></li>
+              <li><router-link to="/register" aria-label="新用户注册">注册</router-link></li>
             </ul>
           </div>
           <div class="col-md-4">
-            <h5>Contact</h5>
-            <p>Email: support@healthypathway.com</p>
+            <h5>联系我们</h5>
+            <p>邮箱: support@healthypathway.com</p>
           </div>
         </div>
       </div>
