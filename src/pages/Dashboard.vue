@@ -19,7 +19,7 @@
 
         <!-- Multilingual Resources -->
         <div class="col-md-6 col-lg-3">
-          <router-link to="/resources" class="text-decoration-none">
+          <router-link to="/health-articles" class="text-decoration-none">
             <div class="card h-100 feature-card">
               <div class="card-body text-center">
                 <i class="bi bi-translate fs-1 mb-3"></i>

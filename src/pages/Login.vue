@@ -3,6 +3,9 @@
     <div class="login-container">
       <h2 class="text-center mb-4">Welcome Back</h2>
       <form @submit.prevent="handleLogin" class="login-form">
+        <div v-if="authStore.error" class="alert alert-danger">
+          {{ authStore.error }}
+        </div>
         <div class="form-group mb-3">
           <label for="email">Email</label>
           <input 
@@ -12,6 +15,7 @@
             class="form-control" 
             placeholder="Enter your email"
             required 
+            :disabled="authStore.loading"
           />
         </div>
         <div class="form-group mb-4">
@@ -23,9 +27,16 @@
             class="form-control"
             placeholder="Enter your password" 
             required 
+            :disabled="authStore.loading"
           />
         </div>
-        <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+        <button 
+          type="submit" 
+          class="btn btn-primary w-100 mb-3"
+          :disabled="authStore.loading"
+        >
+          {{ authStore.loading ? 'Logging in...' : 'Login' }}
+        </button>
         <p class="text-center">
           Don't have an account? 
           <router-link to="/register">Register here</router-link>
@@ -37,15 +48,18 @@
 
 <script>
 import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/store'
 
 export default {
   setup() {
     const router = useRouter()
     const route = useRoute()
+    const authStore = useAuthStore()
 
     return {
       router,
-      route
+      route,
+      authStore
     }
   },
   data() {
@@ -55,35 +69,30 @@ export default {
     }
   },
   methods: {
-    handleLogin() {
-      // 从 localStorage 获取用户数据
-      const storedUserData = localStorage.getItem(this.email)
-      
-      if (!storedUserData) {
-        alert('用户不存在')
+    async handleLogin() {
+      if (!this.email || !this.password) {
+        alert('请输入邮箱和密码')
         return
       }
-
-      const userData = JSON.parse(storedUserData)
-      if (userData.password !== this.password) {
-        alert('密码错误')
-        return
-      }
-
-      // 登录成功，构造用户信息
-      const userInfo = {
-        id: Date.now(), // 生成临时 ID
-        email: userData.email,
-        name: userData.name,
-        role: userData.role
-      }
       
-      // 存储用户信息
-      localStorage.setItem('userInfo', JSON.stringify(userInfo))
+      console.log('尝试Firebase登录:', this.email)
       
-      // 如果是管理员且没有特定的重定向地址，则进入管理后台
-      const redirectPath = this.route.query.redirect || (userInfo.role === 'admin' ? '/admin/dashboard' : '/dashboard')
-      this.router.push(redirectPath)
+      try {
+        // 使用Firebase认证
+        const user = await this.authStore.login(this.email, this.password)
+        console.log('Firebase登录成功，用户:', user)
+
+        // 登录成功后立即重定向，不等待任何异步操作
+        const redirectPath = this.$route.query.redirect || '/dashboard'
+        console.log('准备重定向到:', redirectPath)
+
+        // 使用 Vue Router 进行导航
+        await this.$router.push(redirectPath)
+        console.log('重定向完成')
+      } catch (error) {
+        console.error('登录失败:', error)
+        alert('登录失败，请检查您的邮箱和密码')
+      }
     }
   }
 }

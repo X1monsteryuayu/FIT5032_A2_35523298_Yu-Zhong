@@ -2,6 +2,9 @@
   <div class="container mt-5">
     <h2 class="mb-4">Register for Healthy Pathway</h2>
     <form @submit.prevent="register">
+      <div v-if="authStore.error" class="alert alert-danger">
+        {{ authStore.error }}
+      </div>
 
       <!-- Full Name -->
       <div class="mb-3">
@@ -75,7 +78,13 @@
       </div>
 
       <!-- Submit -->
-      <button class="btn btn-primary" type="submit">Register</button>
+      <button 
+        class="btn btn-primary" 
+        type="submit"
+        :disabled="authStore.loading"
+      >
+        {{ authStore.loading ? 'Registering...' : 'Register' }}
+      </button>
     </form>
   </div>
 </template>
@@ -83,8 +92,13 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/store'
+import { updateProfile } from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
+import { db } from '@/firebase/config'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -128,7 +142,7 @@ const getPasswordStrengthClass = computed(() => {
   return 'bg-success'
 })
 
-const register = () => {
+const register = async () => {
   // 验证所有字段
   if (!name.value || name.value.length < 3) {
     alert('请输入有效的姓名（至少3个字符）')
@@ -155,30 +169,31 @@ const register = () => {
     return
   }
 
-  // 检查邮箱是否已被注册
-  const existingUser = localStorage.getItem(email.value)
-  if (existingUser) {
-    alert('该邮箱已被注册')
-    return
-  }
-
-  const userData = {
-    name: name.value,
-    email: email.value,
-    password: password.value,
-    age: age.value,
-    role: role.value,
-    language: language.value,
-    registeredAt: new Date().toISOString()
-  }
-
   try {
-    localStorage.setItem(email.value, JSON.stringify(userData))
+    // 使用Firebase Authentication注册用户
+    const userCredential = await authStore.register(email.value, password.value)
+    const user = userCredential
+
+    // 更新用户资料
+    await updateProfile(user, {
+      displayName: name.value
+    })
+
+    // 将用户信息保存到Firestore
+    await setDoc(doc(db, 'users', user.uid), {
+      name: name.value,
+      email: email.value,
+      age: parseInt(age.value),
+      role: role.value,
+      language: language.value || 'en',
+      registeredAt: new Date().toISOString()
+    })
+
     alert('注册成功！')
-    // 注册成功后跳转到登录页面
-    router.push('/login')
+    router.push('/dashboard')
   } catch (error) {
-    alert('注册失败，请重试')
+    console.error('Registration failed:', error)
+    // 错误会通过store显示
   }
 }
 </script>

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/store';
 import Home from '../pages/Home.vue';
 import Login from '../pages/Login.vue';
 import Register from '../pages/Register.vue';
@@ -13,6 +14,12 @@ const routes = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/register', name: 'Register', component: Register },
   { path: '/dashboard', name: 'Dashboard', component: Dashboard, meta: { requiresAuth: true } },
+  { 
+    path: '/health-articles', 
+    name: 'HealthArticles', 
+    component: HealthArticles,
+    meta: { requiresAuth: false }
+  },
   { 
     path: '/admin/dashboard', 
     name: 'AdminDashboard', 
@@ -41,6 +48,27 @@ const routes = [
     path: '/consultation', 
     name: 'Consultation', 
     component: () => import('../pages/Consultation.vue'),
+    meta: { requiresAuth: true }
+  },
+  { 
+    path: '/contact', 
+    name: 'Contact', 
+    component: () => import('../pages/Contact.vue')
+  },
+  { 
+    path: '/email-demo', 
+    name: 'EmailDemo', 
+    component: () => import('../pages/EmailDemo.vue')
+  },
+  { 
+    path: '/doctors', 
+    name: 'DoctorList', 
+    component: () => import('../pages/DoctorList.vue')
+  },
+  { 
+    path: '/appointments', 
+    name: 'AppointmentHistory', 
+    component: () => import('../pages/AppointmentHistory.vue'),
     meta: { requiresAuth: true }
   },
   { 
@@ -77,18 +105,25 @@ const router = createRouter({
 
 // Navigation guard
 router.beforeEach((to, from, next) => {
-  const userInfo = localStorage.getItem('userInfo');
-  const isAuthenticated = !!userInfo;
-  const userRole = userInfo ? JSON.parse(userInfo).role : null;
+  const authStore = useAuthStore();
+  const isAuthenticated = authStore.isAuthenticated;
 
-  // Check for admin routes
-  if (to.meta.requiresAdmin && userRole !== 'admin') {
-    next('/dashboard');
+  console.log('路由守卫检查:', {
+    to: to.path,
+    isAuthenticated: isAuthenticated,
+    requiresAuth: to.meta.requiresAuth
+  });
+
+  // 如果用户已认证，但尝试访问登录页，则重定向到仪表板
+  if (isAuthenticated && to.path === '/login') {
+    console.log('用户已认证，重定向到仪表板');
+    next({ path: '/dashboard' });
     return;
   }
 
-  // Check for protected routes
-  if (to.meta.requiresAuth === true && !isAuthenticated) {
+  // 检查是否需要认证的路由
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    console.log('需要认证的路由，重定向到登录页');
     next({
       path: '/login',
       query: { redirect: to.fullPath }
@@ -96,7 +131,7 @@ router.beforeEach((to, from, next) => {
     return;
   }
 
-  // Allow access to public routes
+  console.log('允许访问:', to.path);
   next();
 });
 

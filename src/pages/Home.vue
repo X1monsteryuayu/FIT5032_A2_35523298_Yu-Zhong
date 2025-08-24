@@ -41,8 +41,8 @@
               <h3>Multilingual Resources</h3>
               <p>Access translated health guides and vaccine information</p>
               <div class="mt-3">
-                <router-link to="/resources" class="btn btn-outline-primary">Read More</router-link>
-                <small class="d-block mt-2 text-muted">Login to save articles</small>
+                <router-link to="/health-articles" class="btn btn-outline-primary">Read More</router-link>
+                <small class="d-block mt-2 text-muted">Browse health articles</small>
               </div>
             </div>
           </div>
@@ -115,6 +115,47 @@
             <div class="stat-card">
               <h3 class="stat-number">98%</h3>
               <p class="stat-label">User Satisfaction</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h2 class="section-title">Get in Touch</h2>
+            <p class="contact-text">
+              Have questions about our services? Need help with an appointment? 
+              We're here to help! Send us a message and we'll get back to you as soon as possible.
+            </p>
+            <div class="contact-info">
+              <div class="contact-item">
+                <i class="bi bi-envelope-fill text-primary"></i>
+                <span>info@healthypathway.com</span>
+              </div>
+              <div class="contact-item">
+                <i class="bi bi-telephone-fill text-primary"></i>
+                <span>+1 (555) 123-4567</span>
+              </div>
+              <div class="contact-item">
+                <i class="bi bi-clock-fill text-primary"></i>
+                <span>Mon-Fri: 8:00 AM - 6:00 PM</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="contact-card">
+              <h5 class="mb-4">Send us a Message</h5>
+              <router-link to="/contact" class="btn btn-primary btn-lg">
+                <i class="bi bi-chat-dots me-2"></i>
+                Contact Us
+              </router-link>
+              <p class="mt-3 text-muted">
+                <small>Get email confirmations with PDF attachments for appointments</small>
+              </p>
             </div>
           </div>
         </div>
@@ -250,6 +291,48 @@ export default {
   font-size: 1.15rem;
   opacity: 0.95;
   font-weight: 500;
+}
+
+.contact-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.contact-text {
+  font-size: 1.125rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.contact-info {
+  margin-bottom: 2rem;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.contact-item i {
+  font-size: 1.25rem;
+  margin-right: 1rem;
+  width: 24px;
+}
+
+.contact-card {
+  background: white;
+  padding: 3rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.contact-card .btn {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  border-radius: 50px;
 }
 
 /* 全局居中样式 */

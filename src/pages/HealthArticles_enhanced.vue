@@ -1,9 +1,9 @@
 <template>
   <div class="health-articles">
     <div class="container-fluid">
-      <h1 class="text-center mb-4">Health Articles Management System</h1>
+      <h1 class="text-center mb-4">健康资讯管理系统</h1>
       
-      <!-- Navigation tabs -->
+      <!-- 导航选项卡 -->
       <ul class="nav nav-tabs mb-4" role="tablist">
         <li class="nav-item" role="presentation">
           <button 
@@ -16,7 +16,7 @@
             @click="currentTab = 'articles'"
           >
             <i class="fas fa-newspaper me-2"></i>
-            Articles Management ({{ filteredArticles.length }})
+            文章管理 ({{ filteredArticles.length }})
           </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -30,74 +30,74 @@
             @click="currentTab = 'comments'"
           >
             <i class="fas fa-comments me-2"></i>
-            Comments Management ({{ filteredComments.length }})
+            评论管理 ({{ filteredComments.length }})
           </button>
         </li>
       </ul>
 
       <div class="tab-content">
-        <!-- Articles table -->
+        <!-- 文章表格 -->
         <div class="tab-pane fade show active" id="articles" role="tabpanel">
           <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="mb-0">Articles List</h5>
+              <h5 class="mb-0">文章列表</h5>
               <div class="btn-group">
                 <button class="btn btn-success btn-sm" @click="exportArticlesCSV">
-                  <i class="fas fa-file-csv me-1"></i>Export CSV
+                  <i class="fas fa-file-csv me-1"></i>导出CSV
                 </button>
                 <button class="btn btn-danger btn-sm" @click="exportArticlesPDF">
-                  <i class="fas fa-file-pdf me-1"></i>Export PDF
+                  <i class="fas fa-file-pdf me-1"></i>导出PDF
                 </button>
               </div>
             </div>
             
-            <!-- Articles search filters -->
+            <!-- 文章搜索过滤器 -->
             <div class="card-body pb-0">
               <div class="row g-3 mb-3">
                 <div class="col-md-3">
-                  <label class="form-label small">Search by Title</label>
+                  <label class="form-label small">按标题搜索</label>
                   <input 
                     type="text" 
                     class="form-control form-control-sm" 
                     v-model="articleFilters.title"
-                    placeholder="Search title..."
+                    placeholder="搜索标题..."
                   >
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small">Search by Author</label>
+                  <label class="form-label small">按作者搜索</label>
                   <input 
                     type="text" 
                     class="form-control form-control-sm" 
                     v-model="articleFilters.author"
-                    placeholder="Search author..."
+                    placeholder="搜索作者..."
                   >
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small">Filter by Category</label>
+                  <label class="form-label small">按分类筛选</label>
                   <select class="form-select form-select-sm" v-model="articleFilters.category">
-                    <option value="">All Categories</option>
+                    <option value="">所有分类</option>
                     <option v-for="category in categories" :key="category" :value="category">
                       {{ category }}
                     </option>
                   </select>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small">Sort By</label>
+                  <label class="form-label small">排序方式</label>
                   <select class="form-select form-select-sm" v-model="articleSortBy">
-                    <option value="date_desc">Date ↓</option>
-                    <option value="date_asc">Date ↑</option>
-                    <option value="views_desc">Views ↓</option>
-                    <option value="views_asc">Views ↑</option>
-                    <option value="title_asc">Title A-Z</option>
-                    <option value="title_desc">Title Z-A</option>
+                    <option value="date_desc">日期↓</option>
+                    <option value="date_asc">日期↑</option>
+                    <option value="views_desc">阅读量↓</option>
+                    <option value="views_asc">阅读量↑</option>
+                    <option value="title_asc">标题A-Z</option>
+                    <option value="title_desc">标题Z-A</option>
                   </select>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small">Per Page</label>
+                  <label class="form-label small">每页条数</label>
                   <select class="form-select form-select-sm" v-model="articlesPerPage">
-                    <option value="10">10 per page</option>
-                    <option value="20">20 per page</option>
-                    <option value="50">50 per page</option>
+                    <option value="10">10条/页</option>
+                    <option value="20">20条/页</option>
+                    <option value="50">50条/页</option>
                   </select>
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
@@ -108,17 +108,17 @@
               </div>
             </div>
 
-            <!-- Articles table -->
+            <!-- 文章表格 -->
             <div class="table-responsive">
               <table class="table table-hover mb-0">
                 <thead class="table-light">
                   <tr>
-                    <th style="width: 40%">Title</th>
-                    <th style="width: 15%">Author</th>
-                    <th style="width: 10%">Category</th>
-                    <th style="width: 12%">Published Date</th>
-                    <th style="width: 8%">Views</th>
-                    <th style="width: 15%">Tags</th>
+                    <th style="width: 40%">标题</th>
+                    <th style="width: 15%">作者</th>
+                    <th style="width: 10%">分类</th>
+                    <th style="width: 12%">发布日期</th>
+                    <th style="width: 8%">阅读量</th>
+                    <th style="width: 15%">标签</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -149,23 +149,23 @@
               </table>
             </div>
 
-            <!-- Articles pagination -->
+            <!-- 文章分页 -->
             <div class="card-footer d-flex justify-content-between align-items-center">
               <span class="text-muted">
-                Showing {{ (currentArticlePage - 1) * articlesPerPage + 1 }} - 
+                显示 {{ (currentArticlePage - 1) * articlesPerPage + 1 }} - 
                 {{ Math.min(currentArticlePage * articlesPerPage, filteredArticles.length) }} 
-                of {{ filteredArticles.length }} entries
+                条，共 {{ filteredArticles.length }} 条
               </span>
               <nav>
                 <ul class="pagination pagination-sm mb-0">
                   <li class="page-item" :class="{ disabled: currentArticlePage === 1 }">
                     <button class="page-link" @click="currentArticlePage = 1" :disabled="currentArticlePage === 1">
-                      First
+                      首页
                     </button>
                   </li>
                   <li class="page-item" :class="{ disabled: currentArticlePage === 1 }">
                     <button class="page-link" @click="currentArticlePage--" :disabled="currentArticlePage === 1">
-                      Previous
+                      上一页
                     </button>
                   </li>
                   <li 
@@ -180,12 +180,12 @@
                   </li>
                   <li class="page-item" :class="{ disabled: currentArticlePage === totalArticlePages }">
                     <button class="page-link" @click="currentArticlePage++" :disabled="currentArticlePage === totalArticlePages">
-                      Next
+                      下一页
                     </button>
                   </li>
                   <li class="page-item" :class="{ disabled: currentArticlePage === totalArticlePages }">
                     <button class="page-link" @click="currentArticlePage = totalArticlePages" :disabled="currentArticlePage === totalArticlePages">
-                      Last
+                      末页
                     </button>
                   </li>
                 </ul>
@@ -194,57 +194,57 @@
           </div>
         </div>
 
-        <!-- Comments table -->
+        <!-- 评论表格 -->
         <div class="tab-pane fade" id="comments" role="tabpanel">
           <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="mb-0">Comments Management</h5>
+              <h5 class="mb-0">评论管理</h5>
               <div class="btn-group">
                 <button class="btn btn-success btn-sm" @click="exportCommentsCSV">
-                  <i class="fas fa-file-csv me-1"></i>Export CSV
+                  <i class="fas fa-file-csv me-1"></i>导出CSV
                 </button>
                 <button class="btn btn-danger btn-sm" @click="exportCommentsPDF">
-                  <i class="fas fa-file-pdf me-1"></i>Export PDF
+                  <i class="fas fa-file-pdf me-1"></i>导出PDF
                 </button>
               </div>
             </div>
             
-            <!-- Comments search filters -->
+            <!-- 评论搜索过滤器 -->
             <div class="card-body pb-0">
               <div class="row g-3 mb-3">
                 <div class="col-md-3">
-                  <label class="form-label small">Search by Commenter</label>
+                  <label class="form-label small">按评论者搜索</label>
                   <input 
                     type="text" 
                     class="form-control form-control-sm" 
                     v-model="commentFilters.commenter"
-                    placeholder="Search commenter..."
+                    placeholder="搜索评论者..."
                   >
                 </div>
                 <div class="col-md-4">
-                  <label class="form-label small">Search by Content</label>
+                  <label class="form-label small">按内容搜索</label>
                   <input 
                     type="text" 
                     class="form-control form-control-sm" 
                     v-model="commentFilters.content"
-                    placeholder="Search comment content..."
+                    placeholder="搜索评论内容..."
                   >
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small">Sort By</label>
+                  <label class="form-label small">排序方式</label>
                   <select class="form-select form-select-sm" v-model="commentSortBy">
-                    <option value="date_desc">Time ↓</option>
-                    <option value="date_asc">Time ↑</option>
-                    <option value="likes_desc">Likes ↓</option>
-                    <option value="likes_asc">Likes ↑</option>
+                    <option value="date_desc">时间↓</option>
+                    <option value="date_asc">时间↑</option>
+                    <option value="likes_desc">点赞↓</option>
+                    <option value="likes_asc">点赞↑</option>
                   </select>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label small">Per Page</label>
+                  <label class="form-label small">每页条数</label>
                   <select class="form-select form-select-sm" v-model="commentsPerPage">
-                    <option value="10">10 per page</option>
-                    <option value="20">20 per page</option>
-                    <option value="50">50 per page</option>
+                    <option value="10">10条/页</option>
+                    <option value="20">20条/页</option>
+                    <option value="50">50条/页</option>
                   </select>
                 </div>
                 <div class="col-md-1 d-flex align-items-end">
@@ -255,16 +255,16 @@
               </div>
             </div>
 
-            <!-- Comments table -->
+            <!-- 评论表格 -->
             <div class="table-responsive">
               <table class="table table-hover mb-0">
                 <thead class="table-light">
                   <tr>
-                    <th style="width: 15%">Commenter</th>
-                    <th style="width: 50%">Comment Content</th>
-                    <th style="width: 15%">Comment Time</th>
-                    <th style="width: 10%">Likes</th>
-                    <th style="width: 10%">Actions</th>
+                    <th style="width: 15%">评论者</th>
+                    <th style="width: 50%">评论内容</th>
+                    <th style="width: 15%">评论时间</th>
+                    <th style="width: 10%">点赞数</th>
+                    <th style="width: 10%">操作</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -280,7 +280,7 @@
                     </td>
                     <td>
                       <div>{{ truncateText(comment.content, 120) }}</div>
-                      <small class="text-muted">Article: {{ comment.articleTitle }}</small>
+                      <small class="text-muted">文章: {{ comment.articleTitle }}</small>
                     </td>
                     <td>{{ formatDateTime(comment.date) }}</td>
                     <td>
@@ -303,23 +303,23 @@
               </table>
             </div>
 
-            <!-- Comments pagination -->
+            <!-- 评论分页 -->
             <div class="card-footer d-flex justify-content-between align-items-center">
               <span class="text-muted">
-                Showing {{ (currentCommentPage - 1) * commentsPerPage + 1 }} - 
+                显示 {{ (currentCommentPage - 1) * commentsPerPage + 1 }} - 
                 {{ Math.min(currentCommentPage * commentsPerPage, filteredComments.length) }} 
-                of {{ filteredComments.length }} entries
+                条，共 {{ filteredComments.length }} 条
               </span>
               <nav>
                 <ul class="pagination pagination-sm mb-0">
                   <li class="page-item" :class="{ disabled: currentCommentPage === 1 }">
                     <button class="page-link" @click="currentCommentPage = 1" :disabled="currentCommentPage === 1">
-                      First
+                      首页
                     </button>
                   </li>
                   <li class="page-item" :class="{ disabled: currentCommentPage === 1 }">
                     <button class="page-link" @click="currentCommentPage--" :disabled="currentCommentPage === 1">
-                      Previous
+                      上一页
                     </button>
                   </li>
                   <li 
@@ -334,12 +334,12 @@
                   </li>
                   <li class="page-item" :class="{ disabled: currentCommentPage === totalCommentPages }">
                     <button class="page-link" @click="currentCommentPage++" :disabled="currentCommentPage === totalCommentPages">
-                      Next
+                      下一页
                     </button>
                   </li>
                   <li class="page-item" :class="{ disabled: currentCommentPage === totalCommentPages }">
                     <button class="page-link" @click="currentCommentPage = totalCommentPages" :disabled="currentCommentPage === totalCommentPages">
-                      Last
+                      末页
                     </button>
                   </li>
                 </ul>
@@ -361,255 +361,255 @@ export default {
     return {
       currentTab: 'articles',
       
-      // Article data
+      // 文章数据
       articles: [
         {
           id: 1,
-          title: 'How to Maintain a Healthy Lifestyle',
-          author: 'Dr. Li',
-          category: 'Healthy Living',
+          title: '如何保持健康的生活方式',
+          author: '李医生',
+          category: '健康生活',
           date: '2024-01-15',
           views: 1250,
-          tags: ['Health', 'Lifestyle', 'Prevention'],
-          summary: 'This article introduces the basic principles of maintaining a healthy lifestyle, including balanced diet, regular exercise, adequate sleep and other important factors.'
+          tags: ['健康', '生活方式', '预防'],
+          summary: '本文介绍了保持健康生活方式的基本原则，包括均衡饮食、规律运动、充足睡眠等重要因素。'
         },
         {
           id: 2,
-          title: 'Prevention and Treatment of Cardiovascular Disease',
-          author: 'Dr. Wang',
-          category: 'Cardiovascular',
+          title: '心血管疾病的预防与治疗',
+          author: '王医生',
+          category: '心血管',
           date: '2024-01-10',
           views: 980,
-          tags: ['Cardiovascular', 'Prevention', 'Treatment'],
-          summary: 'Cardiovascular disease is a common health problem for modern people. This article details prevention measures and treatment methods.'
+          tags: ['心血管', '预防', '治疗'],
+          summary: '心血管疾病是现代人常见的健康问题，本文详细介绍了预防措施和治疗方法。'
         },
         {
           id: 3,
-          title: 'Dietary Guidelines for Diabetic Patients',
-          author: 'Dr. Zhang',
-          category: 'Diabetes',
+          title: '糖尿病患者的饮食指南',
+          author: '张医生',
+          category: '糖尿病',
           date: '2024-01-08',
           views: 2100,
-          tags: ['Diabetes', 'Diet', 'Management'],
-          summary: 'Provides scientific dietary advice for diabetic patients to help control blood sugar levels.'
+          tags: ['糖尿病', '饮食', '管理'],
+          summary: '为糖尿病患者提供科学的饮食建议，帮助控制血糖水平。'
         },
         {
           id: 4,
-          title: 'Childhood Vaccination Schedule',
-          author: 'Dr. Chen',
-          category: 'Pediatrics',
+          title: '儿童疫苗接种时间表',
+          author: '陈医生',
+          category: '儿科',
           date: '2024-01-05',
           views: 1560,
-          tags: ['Pediatrics', 'Vaccines', 'Prevention'],
-          summary: 'Detailed childhood vaccination schedule and precautions.'
+          tags: ['儿科', '疫苗', '预防'],
+          summary: '详细的儿童疫苗接种时间表和注意事项。'
         },
         {
           id: 5,
-          title: 'Prevention of Osteoporosis in the Elderly',
-          author: 'Dr. Liu',
-          category: 'Geriatrics',
+          title: '老年人骨质疏松的预防',
+          author: '刘医生',
+          category: '老年医学',
           date: '2024-01-03',
           views: 890,
-          tags: ['Elderly', 'Osteoporosis', 'Prevention'],
-          summary: 'Osteoporosis prevention measures and treatment recommendations for elderly populations.'
+          tags: ['老年', '骨质疏松', '预防'],
+          summary: '针对老年人群体的骨质疏松预防措施和治疗建议。'
         },
         {
           id: 6,
-          title: 'Nutritional Supplements During Pregnancy',
-          author: 'Dr. Zhao',
-          category: 'Obstetrics & Gynecology',
+          title: '孕期营养补充指南',
+          author: '赵医生',
+          category: '妇产科',
           date: '2024-01-01',
           views: 1780,
-          tags: ['Pregnancy', 'Nutrition', 'Health'],
-          summary: 'Provides scientific pregnancy nutrition supplement recommendations for expectant mothers.'
+          tags: ['孕期', '营养', '健康'],
+          summary: '为准妈妈们提供科学的孕期营养补充建议。'
         },
         {
           id: 7,
-          title: 'Identification and Treatment of Common Skin Diseases',
-          author: 'Dr. Sun',
-          category: 'Dermatology',
+          title: '常见皮肤病的识别与治疗',
+          author: '孙医生',
+          category: '皮肤科',
           date: '2023-12-28',
           views: 1340,
-          tags: ['Skin Disease', 'Treatment', 'Identification'],
-          summary: 'Introduces symptom identification and treatment methods for common skin diseases.'
+          tags: ['皮肤病', '治疗', '识别'],
+          summary: '介绍常见皮肤病的症状识别和治疗方法。'
         },
         {
           id: 8,
-          title: 'The Importance of Mental Health',
-          author: 'Dr. Zhou',
-          category: 'Psychiatry',
+          title: '精神健康的重要性',
+          author: '周医生',
+          category: '精神科',
           date: '2023-12-25',
           views: 720,
-          tags: ['Mental Health', 'Psychology', 'Stress'],
-          summary: 'Explores the importance of mental health for overall health and maintenance methods.'
+          tags: ['精神健康', '心理', '压力'],
+          summary: '探讨精神健康对整体健康的重要性和维护方法。'
         },
         {
           id: 9,
-          title: 'Eye Health Protection Guide',
-          author: 'Dr. Wu',
-          category: 'Ophthalmology',
+          title: '眼部健康保护指南',
+          author: '吴医生',
+          category: '眼科',
           date: '2023-12-22',
           views: 1120,
-          tags: ['Ophthalmology', 'Vision', 'Protection'],
-          summary: 'How to protect eye health and prevent common eye diseases.'
+          tags: ['眼科', '视力', '保护'],
+          summary: '如何保护眼部健康，预防常见眼部疾病。'
         },
         {
           id: 10,
-          title: 'Prevention and Rehabilitation of Sports Injuries',
-          author: 'Dr. Zheng',
-          category: 'Sports Medicine',
+          title: '运动损伤的预防与康复',
+          author: '郑医生',
+          category: '运动医学',
           date: '2023-12-20',
           views: 1650,
-          tags: ['Sports', 'Injury', 'Rehabilitation'],
-          summary: 'Essential injury prevention and rehabilitation guide for sports enthusiasts.'
+          tags: ['运动', '损伤', '康复'],
+          summary: '运动爱好者必读的损伤预防和康复指南。'
         },
         {
           id: 11,
-          title: 'Respiratory Disease Protection',
-          author: 'Dr. Ma',
-          category: 'Respiratory Medicine',
+          title: '呼吸系统疾病防护',
+          author: '马医生',
+          category: '呼吸科',
           date: '2023-12-18',
           views: 950,
-          tags: ['Respiratory', 'Disease', 'Protection'],
-          summary: 'Prevention measures and daily care methods for respiratory diseases.'
+          tags: ['呼吸', '疾病', '防护'],
+          summary: '呼吸系统疾病的预防措施和日常护理方法。'
         },
         {
           id: 12,
-          title: 'The Importance of Healthy Sleep',
-          author: 'Dr. Lin',
-          category: 'Sleep Medicine',
+          title: '健康睡眠的重要性',
+          author: '林医生',
+          category: '睡眠医学',
           date: '2023-12-15',
           views: 2300,
-          tags: ['Sleep', 'Health', 'Quality'],
-          summary: 'The importance of good sleep for health and methods to improve sleep quality.'
+          tags: ['睡眠', '健康', '质量'],
+          summary: '良好睡眠对健康的重要性及改善睡眠质量的方法。'
         }
       ],
       
-      // Comments data
+      // 评论数据
       comments: [
         {
           id: 1,
-          commenter: 'John Smith',
-          email: 'john.smith@email.com',
-          avatar: 'https://via.placeholder.com/32x32/007bff/ffffff?text=JS',
-          content: 'This article is very well written and very helpful to me. The dietary advice is particularly practical.',
-          articleTitle: 'How to Maintain a Healthy Lifestyle',
+          commenter: '张三',
+          email: 'zhangsan@email.com',
+          avatar: 'https://via.placeholder.com/32x32/007bff/ffffff?text=张',
+          content: '这篇文章写得非常好，对我很有帮助。特别是关于饮食方面的建议很实用。',
+          articleTitle: '如何保持健康的生活方式',
           date: '2024-01-16T10:30:00',
           likes: 15
         },
         {
           id: 2,
-          commenter: 'Lisa Wang',
-          email: 'lisa.wang@email.com',
-          avatar: 'https://via.placeholder.com/32x32/28a745/ffffff?text=LW',
-          content: "The doctor's advice is very professional. I adjusted my routine according to the article's methods and felt a significant improvement in my physical condition.",
-          articleTitle: 'Prevention and Treatment of Cardiovascular Disease',
+          commenter: '李四',
+          email: 'lisi@email.com',
+          avatar: 'https://via.placeholder.com/32x32/28a745/ffffff?text=李',
+          content: '医生的建议很专业，我按照文章的方法调整了作息，感觉身体状况有了明显改善。',
+          articleTitle: '心血管疾病的预防与治疗',
           date: '2024-01-15T14:20:00',
           likes: 23
         },
         {
           id: 3,
-          commenter: 'Mike Brown',
-          email: 'mike.brown@email.com',
-          avatar: 'https://via.placeholder.com/32x32/dc3545/ffffff?text=MB',
-          content: 'As a diabetic patient, this dietary guide is too important for me. I have bookmarked it and will strictly follow it.',
-          articleTitle: 'Dietary Guidelines for Diabetic Patients',
+          commenter: '王五',
+          email: 'wangwu@email.com',
+          avatar: 'https://via.placeholder.com/32x32/dc3545/ffffff?text=王',
+          content: '作为糖尿病患者，这个饮食指南对我来说太重要了。已经收藏了，会严格按照执行。',
+          articleTitle: '糖尿病患者的饮食指南',
           date: '2024-01-14T09:15:00',
           likes: 31
         },
         {
           id: 4,
-          commenter: 'Sarah Johnson',
-          email: 'sarah.johnson@email.com',
-          avatar: 'https://via.placeholder.com/32x32/ffc107/ffffff?text=SJ',
-          content: 'The childhood vaccination schedule is very detailed. As a new mother, this information is so useful. Thank you for sharing!',
-          articleTitle: 'Childhood Vaccination Schedule',
+          commenter: '赵六',
+          email: 'zhaoliu@email.com',
+          avatar: 'https://via.placeholder.com/32x32/ffc107/ffffff?text=赵',
+          content: '儿童疫苗时间表很详细，作为新手妈妈，这个信息太有用了。谢谢医生的分享！',
+          articleTitle: '儿童疫苗接种时间表',
           date: '2024-01-13T16:45:00',
           likes: 18
         },
         {
           id: 5,
-          commenter: 'David Lee',
-          email: 'david.lee@email.com',
-          avatar: 'https://via.placeholder.com/32x32/6f42c1/ffffff?text=DL',
-          content: 'My mother is facing osteoporosis problems. The prevention methods provided in this article are very practical, I will recommend it to her.',
-          articleTitle: 'Prevention of Osteoporosis in the Elderly',
+          commenter: '钱七',
+          email: 'qianqi@email.com',
+          avatar: 'https://via.placeholder.com/32x32/6f42c1/ffffff?text=钱',
+          content: '我妈妈正在面临骨质疏松的问题，这篇文章提供的预防方法很实用，会推荐给她看。',
+          articleTitle: '老年人骨质疏松的预防',
           date: '2024-01-12T11:30:00',
           likes: 12
         },
         {
           id: 6,
-          commenter: 'Nancy Chen',
-          email: 'nancy.chen@email.com',
-          avatar: 'https://via.placeholder.com/32x32/20c997/ffffff?text=NC',
-          content: 'Nutrition during pregnancy is indeed very important. This guide taught me a lot of knowledge I did not know before.',
-          articleTitle: 'Nutritional Supplements During Pregnancy',
+          commenter: '孙八',
+          email: 'sunba@email.com',
+          avatar: 'https://via.placeholder.com/32x32/20c997/ffffff?text=孙',
+          content: '怀孕期间营养确实很重要，这个指南让我了解了很多之前不知道的知识点。',
+          articleTitle: '孕期营养补充指南',
           date: '2024-01-11T13:20:00',
           likes: 27
         },
         {
           id: 7,
-          commenter: 'Robert Wilson',
-          email: 'robert.wilson@email.com',
-          avatar: 'https://via.placeholder.com/32x32/fd7e14/ffffff?text=RW',
-          content: 'The skin disease identification pictures are very clear, and I can make a preliminary judgment of my condition, but I still need to go to the hospital for diagnosis.',
-          articleTitle: 'Identification and Treatment of Common Skin Diseases',
+          commenter: '周九',
+          email: 'zhoujiu@email.com',
+          avatar: 'https://via.placeholder.com/32x32/fd7e14/ffffff?text=周',
+          content: '皮肤病识别图片很清晰，对照着能够初步判断自己的情况，但还是要去医院确诊。',
+          articleTitle: '常见皮肤病的识别与治疗',
           date: '2024-01-10T08:45:00',
           likes: 9
         },
         {
           id: 8,
-          commenter: 'Emily Davis',
-          email: 'emily.davis@email.com',
-          avatar: 'https://via.placeholder.com/32x32/e83e8c/ffffff?text=ED',
-          content: 'Modern society is stressful, and mental health really needs attention. I will try the stress reduction methods mentioned in the article.',
-          articleTitle: 'The Importance of Mental Health',
+          commenter: '吴十',
+          email: 'wushi@email.com',
+          avatar: 'https://via.placeholder.com/32x32/e83e8c/ffffff?text=吴',
+          content: '现代社会压力大，精神健康确实需要重视。文章提到的减压方法我会尝试。',
+          articleTitle: '精神健康的重要性',
           date: '2024-01-09T15:10:00',
           likes: 21
         },
         {
           id: 9,
-          commenter: 'Tom Anderson',
-          email: 'tom.anderson@email.com',
-          avatar: 'https://via.placeholder.com/32x32/6610f2/ffffff?text=TA',
-          content: 'Long-term computer use makes my eyes often dry. Following the article\'s advice to do eye exercises, there is indeed improvement.',
-          articleTitle: 'Eye Health Protection Guide',
+          commenter: '郑十一',
+          email: 'zhengshiyi@email.com',
+          avatar: 'https://via.placeholder.com/32x32/6610f2/ffffff?text=郑',
+          content: '长期使用电脑，眼睛经常干涩。按照文章的建议做眼保健操，确实有改善。',
+          articleTitle: '眼部健康保护指南',
           date: '2024-01-08T12:00:00',
           likes: 14
         },
         {
           id: 10,
-          commenter: 'Amy Taylor',
-          email: 'amy.taylor@email.com',
-          avatar: 'https://via.placeholder.com/32x32/198754/ffffff?text=AT',
-          content: 'A must-read for sports enthusiasts! I was injured during exercise before, and now I know how to prevent it properly.',
-          articleTitle: 'Prevention and Rehabilitation of Sports Injuries',
+          commenter: '王十二',
+          email: 'wangshier@email.com',
+          avatar: 'https://via.placeholder.com/32x32/198754/ffffff?text=王',
+          content: '运动爱好者必看！之前运动受过伤，现在知道如何正确预防了。',
+          articleTitle: '运动损伤的预防与康复',
           date: '2024-01-07T17:30:00',
           likes: 33
         },
         {
           id: 11,
-          commenter: 'Chris Martinez',
-          email: 'chris.martinez@email.com',
-          avatar: 'https://via.placeholder.com/32x32/17a2b8/ffffff?text=CM',
-          content: 'The smog has been severe recently, and respiratory protection knowledge is very timely. The mask selection section is particularly useful.',
-          articleTitle: 'Respiratory Disease Protection',
+          commenter: '刘十三',
+          email: 'liushisan@email.com',
+          avatar: 'https://via.placeholder.com/32x32/17a2b8/ffffff?text=刘',
+          content: '最近雾霾严重，呼吸系统防护知识很及时。口罩选择部分特别有用。',
+          articleTitle: '呼吸系统疾病防护',
           date: '2024-01-06T19:15:00',
           likes: 19
         },
         {
           id: 12,
-          commenter: 'Alex Robinson',
-          email: 'alex.robinson@email.com',
-          avatar: 'https://via.placeholder.com/32x32/343a40/ffffff?text=AR',
-          content: 'Insomnia has been bothering me for a long time. I will seriously implement the sleep hygiene habits mentioned in the article. Hope it can improve sleep quality.',
-          articleTitle: 'The Importance of Healthy Sleep',
+          commenter: '陈十四',
+          email: 'chenshisi@email.com',
+          avatar: 'https://via.placeholder.com/32x32/343a40/ffffff?text=陈',
+          content: '失眠困扰我很久了，文章提到的睡眠卫生习惯我会认真执行。希望能改善睡眠质量。',
+          articleTitle: '健康睡眠的重要性',
           date: '2024-01-05T21:45:00',
           likes: 26
         }
       ],
 
-      // Filters
+      // 过滤器
       articleFilters: {
         title: '',
         author: '',
@@ -620,11 +620,11 @@ export default {
         content: ''
       },
 
-      // Sorting
+      // 排序
       articleSortBy: 'date_desc',
       commentSortBy: 'date_desc',
 
-      // Pagination
+      // 分页
       currentArticlePage: 1,
       currentCommentPage: 1,
       articlesPerPage: 10,
@@ -633,12 +633,12 @@ export default {
   },
 
   computed: {
-    // Category list
+    // 分类列表
     categories() {
       return [...new Set(this.articles.map(article => article.category))]
     },
 
-    // Filtered articles
+    // 过滤后的文章
     filteredArticles() {
       let filtered = this.articles.filter(article => {
         return (!this.articleFilters.title || article.title.toLowerCase().includes(this.articleFilters.title.toLowerCase())) &&
@@ -646,22 +646,22 @@ export default {
                (!this.articleFilters.category || article.category === this.articleFilters.category)
       })
 
-      // Sorting
+      // 排序
       return this.sortArticles(filtered)
     },
 
-    // Filtered comments
+    // 过滤后的评论
     filteredComments() {
       let filtered = this.comments.filter(comment => {
         return (!this.commentFilters.commenter || comment.commenter.toLowerCase().includes(this.commentFilters.commenter.toLowerCase())) &&
                (!this.commentFilters.content || comment.content.toLowerCase().includes(this.commentFilters.content.toLowerCase()))
       })
 
-      // Sorting
+      // 排序
       return this.sortComments(filtered)
     },
 
-    // Article pagination
+    // 文章分页
     totalArticlePages() {
       return Math.ceil(this.filteredArticles.length / this.articlesPerPage)
     },
@@ -677,7 +677,7 @@ export default {
       const total = this.totalArticlePages
       const current = this.currentArticlePage
       
-      // Show page numbers around current page
+      // 显示当前页附近的页码
       const start = Math.max(1, current - 2)
       const end = Math.min(total, current + 2)
       
@@ -687,7 +687,7 @@ export default {
       return pages
     },
 
-    // Comment pagination
+    // 评论分页
     totalCommentPages() {
       return Math.ceil(this.filteredComments.length / this.commentsPerPage)
     },
@@ -714,7 +714,7 @@ export default {
   },
 
   watch: {
-    // Listen for filter changes, reset page number
+    // 监听过滤器变化，重置页码
     articleFilters: {
       handler() {
         this.currentArticlePage = 1
@@ -736,7 +736,7 @@ export default {
   },
 
   methods: {
-    // Article sorting
+    // 文章排序
     sortArticles(articles) {
       const sorted = [...articles]
       switch (this.articleSortBy) {
@@ -757,7 +757,7 @@ export default {
       }
     },
 
-    // Comment sorting
+    // 评论排序
     sortComments(comments) {
       const sorted = [...comments]
       switch (this.commentSortBy) {
@@ -774,7 +774,7 @@ export default {
       }
     },
 
-    // Clear filters
+    // 清除过滤器
     clearArticleFilters() {
       this.articleFilters = {
         title: '',
@@ -790,25 +790,25 @@ export default {
       }
     },
 
-    // Format date
+    // 格式化日期
     formatDate(dateString) {
       const date = new Date(dateString)
-      return date.toLocaleDateString('en-US')
+      return date.toLocaleDateString('zh-CN')
     },
 
     formatDateTime(dateString) {
       const date = new Date(dateString)
-      return date.toLocaleString('en-US')
+      return date.toLocaleString('zh-CN')
     },
 
-    // Truncate text
+    // 截取文本
     truncateText(text, length) {
       return text.length > length ? text.substring(0, length) + '...' : text
     },
 
-    // Export CSV
+    // 导出CSV
     exportArticlesCSV() {
-      const headers = ['Title', 'Author', 'Category', 'Publish Date', 'Views', 'Tags']
+      const headers = ['标题', '作者', '分类', '发布日期', '阅读量', '标签']
       const csvContent = [
         headers.join(','),
         ...this.filteredArticles.map(article => [
@@ -821,11 +821,11 @@ export default {
         ].join(','))
       ].join('\n')
 
-      this.downloadCSV(csvContent, 'health-articles-list.csv')
+      this.downloadCSV(csvContent, '健康文章列表.csv')
     },
 
     exportCommentsCSV() {
-      const headers = ['Commenter', 'Comment Content', 'Article Title', 'Comment Time', 'Likes']
+      const headers = ['评论者', '评论内容', '文章标题', '评论时间', '点赞数']
       const csvContent = [
         headers.join(','),
         ...this.filteredComments.map(comment => [
@@ -837,7 +837,7 @@ export default {
         ].join(','))
       ].join('\n')
 
-      this.downloadCSV(csvContent, 'article-comments-list.csv')
+      this.downloadCSV(csvContent, '文章评论列表.csv')
     },
 
     downloadCSV(content, filename) {
@@ -854,116 +854,95 @@ export default {
       }
     },
 
-    // Export PDF
+    // 导出PDF
     exportArticlesPDF() {
-      import('jspdf').then(({ jsPDF }) => {
-        const doc = new jsPDF()
+      const doc = new jsPDF()
+      
+      // 设置字体
+      doc.setFont('helvetica')
+      
+      // 标题
+      doc.setFontSize(18)
+      doc.text('Health Articles Report', 20, 20)
+      
+      // 统计信息
+      doc.setFontSize(12)
+      doc.text(`Total Articles: ${this.filteredArticles.length}`, 20, 35)
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45)
+      
+      // 表头
+      let yPosition = 60
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'bold')
+      doc.text('Title', 20, yPosition)
+      doc.text('Author', 100, yPosition)
+      doc.text('Category', 140, yPosition)
+      doc.text('Views', 170, yPosition)
+      
+      // 数据行
+      doc.setFont('helvetica', 'normal')
+      this.filteredArticles.slice(0, 30).forEach((article, index) => {
+        yPosition += 10
+        if (yPosition > 270) {
+          doc.addPage()
+          yPosition = 20
+        }
         
-        // Set font to support Unicode characters
-        doc.setFont('helvetica')
-        
-        // Title
-        doc.setFontSize(18)
-        doc.text('Health Articles Report', 20, 20)
-        
-        // Statistics
-        doc.setFontSize(12)
-        doc.text(`Total Articles: ${this.filteredArticles.length}`, 20, 35)
-        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45)
-        
-        // Table header
-        let yPosition = 60
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'bold')
-        doc.text('Title', 20, yPosition)
-        doc.text('Author', 100, yPosition)
-        doc.text('Category', 140, yPosition)
-        doc.text('Views', 170, yPosition)
-        
-        // Data rows
-        doc.setFont('helvetica', 'normal')
-        this.filteredArticles.slice(0, 30).forEach((article, index) => {
-          yPosition += 10
-          if (yPosition > 270) {
-            doc.addPage()
-            yPosition = 20
-          }
-          
-          // Encode text properly to handle Unicode characters
-          const titleText = this.encodeForPDF(this.truncateText(article.title, 30))
-          const authorText = this.encodeForPDF(article.author)
-          const categoryText = this.encodeForPDF(article.category)
-          
-          doc.text(titleText, 20, yPosition)
-          doc.text(authorText, 100, yPosition)
-          doc.text(categoryText, 140, yPosition)
-          doc.text(article.views.toString(), 170, yPosition)
-        })
-        
-        doc.save('health-articles-report.pdf')
+        doc.text(this.truncateText(article.title, 30), 20, yPosition)
+        doc.text(article.author, 100, yPosition)
+        doc.text(article.category, 140, yPosition)
+        doc.text(article.views.toString(), 170, yPosition)
       })
+      
+      doc.save('健康文章报告.pdf')
     },
 
     exportCommentsPDF() {
-      import('jspdf').then(({ jsPDF }) => {
-        const doc = new jsPDF()
+      const doc = new jsPDF()
+      
+      doc.setFont('helvetica')
+      doc.setFontSize(18)
+      doc.text('Comments Report', 20, 20)
+      
+      doc.setFontSize(12)
+      doc.text(`Total Comments: ${this.filteredComments.length}`, 20, 35)
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45)
+      
+      let yPosition = 60
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'bold')
+      doc.text('Commenter', 20, yPosition)
+      doc.text('Content', 60, yPosition)
+      doc.text('Likes', 170, yPosition)
+      
+      doc.setFont('helvetica', 'normal')
+      this.filteredComments.slice(0, 30).forEach((comment, index) => {
+        yPosition += 15
+        if (yPosition > 270) {
+          doc.addPage()
+          yPosition = 20
+        }
         
-        doc.setFont('helvetica')
-        doc.setFontSize(18)
-        doc.text('Comments Report', 20, 20)
-        
-        doc.setFontSize(12)
-        doc.text(`Total Comments: ${this.filteredComments.length}`, 20, 35)
-        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45)
-        
-        let yPosition = 60
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'bold')
-        doc.text('Commenter', 20, yPosition)
-        doc.text('Content', 60, yPosition)
-        doc.text('Likes', 170, yPosition)
-        
-        doc.setFont('helvetica', 'normal')
-        this.filteredComments.slice(0, 30).forEach((comment, index) => {
-          yPosition += 15
-          if (yPosition > 270) {
-            doc.addPage()
-            yPosition = 20
-          }
-          
-          // Encode text properly to handle Unicode characters
-          const commenterText = this.encodeForPDF(comment.commenter)
-          const contentText = this.encodeForPDF(this.truncateText(comment.content, 40))
-          
-          doc.text(commenterText, 20, yPosition)
-          doc.text(contentText, 60, yPosition)
-          doc.text(comment.likes.toString(), 170, yPosition)
-        })
-        
-        doc.save('article-comments-report.pdf')
+        doc.text(comment.commenter, 20, yPosition)
+        doc.text(this.truncateText(comment.content, 40), 60, yPosition)
+        doc.text(comment.likes.toString(), 170, yPosition)
       })
+      
+      doc.save('文章评论报告.pdf')
     },
 
-    // Helper method to encode text for PDF to handle Unicode characters
-    encodeForPDF(text) {
-      // Convert to ASCII-safe characters or use fallback for unsupported characters
-      return text
-        .replace(/[\u4e00-\u9fff]/g, '?') // Replace Chinese characters with ? for now
-        .replace(/[^\x00-\x7F]/g, '?') // Replace any non-ASCII characters
-    },
-
-    // View comment details
+    // 查看评论详情
     viewComment(comment) {
-      alert(`Comment Details:\n\nCommenter: ${comment.commenter}\nContent: ${comment.content}\nArticle: ${comment.articleTitle}\nTime: ${this.formatDateTime(comment.date)}`)
+      alert(`评论详情:\n\n评论者: ${comment.commenter}\n内容: ${comment.content}\n文章: ${comment.articleTitle}\n时间: ${this.formatDateTime(comment.date)}`)
     },
 
-    // Delete comment
+    // 删除评论
     deleteComment(commentId) {
-      if (confirm('Are you sure you want to delete this comment?')) {
+      if (confirm('确定要删除这条评论吗？')) {
         const index = this.comments.findIndex(c => c.id === commentId)
         if (index > -1) {
           this.comments.splice(index, 1)
-          alert('Comment has been deleted')
+          alert('评论已删除')
         }
       }
     }

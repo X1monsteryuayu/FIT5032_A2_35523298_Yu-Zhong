@@ -1,31 +1,7 @@
 <template>
   <div class="app-container">
-    <!-- 响应式导航栏 -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-      <div class="container">
-        <router-link class="navbar-brand d-flex align-items-center" to="/">
-          <img src="./assets/logo.svg" alt="Healthy Pathway" class="nav-logo me-2" />
-          <span class="brand-text">Healthy Pathway</span>
-        </router-link>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarNav" aria-controls="navbarNav"
-                aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <router-link class="nav-link" to="/login">Login</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/register">Register</router-link>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+    <!-- 使用NavBar组件 -->
+    <NavBar />
 
     <!-- 主内容区域 -->
     <main class="main-content container d-flex flex-column justify-content-center align-items-center text-center">
@@ -60,17 +36,11 @@
 
 <script setup>
 import { onMounted } from 'vue'
+import NavBar from './components/NavBar.vue'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 
 onMounted(() => {
-  const toggler = document.querySelector('.navbar-toggler')
-  const collapse = document.querySelector('#navbarNav')
-
-  if (toggler && collapse) {
-    toggler.addEventListener('click', () => {
-      collapse.classList.toggle('show')
-    })
-  }
+  // 应用初始化逻辑可以在这里添加
 })
 </script>
 

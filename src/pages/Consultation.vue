@@ -55,10 +55,14 @@
                 <button 
                   type="submit" 
                   class="btn btn-primary w-100"
-                  :disabled="!isDescriptionValid"
+                  :disabled="!isDescriptionValid || isSubmitting"
                 >
-                  Submit Request
+                  <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  {{ isSubmitting ? 'Submitting...' : 'Submit Request' }}
                 </button>
+                <p class="mt-3 text-center text-muted">
+                  <small><i class="bi bi-envelope me-1"></i> You'll receive a confirmation email with PDF attachment</small>
+                </p>
               </form>
             </div>
           </div>
@@ -69,6 +73,9 @@
 </template>
 
 <script>
+import { sendAppointmentConfirmation } from '@/services/emailService'
+import { useAuthStore } from '@/store'
+
 export default {
   data() {
     return {
@@ -78,7 +85,8 @@ export default {
         description: ''
       },
       maxLength: 500,
-      remainingChars: 500
+      remainingChars: 500,
+      isSubmitting: false
     }
   },
   computed: {
@@ -91,19 +99,54 @@ export default {
     updateCharCount() {
       this.remainingChars = this.maxLength - this.consultation.description.length;
     },
-    submitConsultation() {
+    async submitConsultation() {
       if (!this.isDescriptionValid) {
         return;
       }
-      // Here you would typically make an API call to submit the consultation request
-      console.log('Consultation request:', this.consultation)
-      alert('Your consultation request has been submitted successfully!')
-      this.consultation = {
-        topic: '',
-        language: '',
-        description: ''
+
+      this.isSubmitting = true;
+
+      try {
+        const authStore = useAuthStore();
+        
+        // 创建预约数据
+        const appointmentData = {
+          id: 'CON_' + Date.now(),
+          patientName: authStore.user?.displayName || authStore.user?.email?.split('@')[0] || 'Patient',
+          patientEmail: authStore.user?.email || 'patient@example.com',
+          doctorName: 'Available Doctor',
+          date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(), // 7 days from now
+          time: '2:00 PM',
+          type: this.consultation.topic,
+          language: this.consultation.language,
+          description: this.consultation.description
+        };
+
+        console.log('Consultation request:', appointmentData);
+
+        // 发送确认邮件（带PDF附件）
+        const emailResult = await sendAppointmentConfirmation(appointmentData);
+        
+        if (emailResult.success) {
+          alert('Your consultation request has been submitted successfully! A confirmation email with PDF attachment has been sent to your email address.');
+        } else {
+          alert('Your consultation request has been submitted, but we couldn\'t send the confirmation email. Please check your email settings.');
+        }
+
+        // 重置表单
+        this.consultation = {
+          topic: '',
+          language: '',
+          description: ''
+        };
+        this.remainingChars = this.maxLength;
+        
+      } catch (error) {
+        console.error('Consultation submission error:', error);
+        alert('There was an error submitting your request. Please try again.');
+      } finally {
+        this.isSubmitting = false;
       }
-      this.remainingChars = this.maxLength;
     }
   }
 }
